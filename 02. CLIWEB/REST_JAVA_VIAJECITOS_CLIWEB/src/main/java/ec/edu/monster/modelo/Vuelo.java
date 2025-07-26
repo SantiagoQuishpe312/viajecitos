@@ -9,15 +9,26 @@ import java.util.List;
 @Data
 public class Vuelo {
     private Integer vueloId;
-    private String ciudadOrigenCodigo;  // solo el código de la ciudad origen
-    private String ciudadDestinoCodigo; // solo el código de la ciudad destino
+
+    private String ciudadOrigenCodigo;
+    private String ciudadOrigenNombre;
+    private String ciudadOrigenPais;
+    private String ciudadOrigenAeropuerto;
+    private String ciudadOrigenLatitud;
+    private String ciudadOrigenLongitud;
+
+    private String ciudadDestinoCodigo;
+    private String ciudadDestinoNombre;
+    private String ciudadDestinoPais;
+    private String ciudadDestinoAeropuerto;
+    private String ciudadDestinoLatitud;
+    private String ciudadDestinoLongitud;
+
     private Integer vueloCapacidad;
     private String vueloEstado;
     private LocalDateTime vueloFechaSalida;
     private BigDecimal vueloValor;
-    private Integer asientosDisponibles;
-    private Integer totalAsientos;
-    private String ciudadOrigenNombre;
-    private String ciudadDestinoNombre;
+    private Long totalAsientos;
+    private Long asientosDisponibles;
 
 }

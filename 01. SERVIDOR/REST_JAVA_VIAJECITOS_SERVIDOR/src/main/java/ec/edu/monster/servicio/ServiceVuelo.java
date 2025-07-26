@@ -36,8 +36,8 @@ public class ServiceVuelo implements IServiceVuelo {
 
     @Override
     public Optional<VueloDto> obtenerPorId(Integer id) {
-        return vueloRepository.findById(id)
-                .map(vueloMapper::toDto); // ✅ convertir a DTO
+        return vueloRepository.findVueloConResumenAsientosById(id);
+              // ✅ convertir a DTO
     }
 
     @Override

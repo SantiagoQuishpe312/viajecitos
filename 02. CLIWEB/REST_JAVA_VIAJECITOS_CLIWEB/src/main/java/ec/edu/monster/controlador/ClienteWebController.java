@@ -188,36 +188,16 @@ public class ClienteWebController {
             return "error/404";
         }
 
-        String origen = vuelo.getCiudadOrigenCodigo();
-        String destino = vuelo.getCiudadDestinoCodigo();
+        // Datos para el iframe dinámico
+        model.addAttribute("vuelo", vuelo);
+        model.addAttribute("lat1", vuelo.getCiudadOrigenLatitud());
+        model.addAttribute("lon1", vuelo.getCiudadOrigenLongitud());
+        model.addAttribute("aero1", vuelo.getCiudadOrigenAeropuerto());
+        model.addAttribute("lat2", vuelo.getCiudadDestinoLatitud());
+        model.addAttribute("lon2", vuelo.getCiudadDestinoLongitud());
+        model.addAttribute("aero2", vuelo.getCiudadDestinoAeropuerto());
 
-        // Coordenadas simuladas por ciudad
-        Map<String, double[]> coords = Map.ofEntries(
-                Map.entry("SCL", new double[]{-33.3930, -70.7858}),  // Santiago
-                Map.entry("BOG", new double[]{4.7016, -74.1469}),    // Bogotá
-                Map.entry("MEX", new double[]{19.4361, -99.0719}),   // Ciudad de México
-                Map.entry("UIO", new double[]{-0.1255, -78.3546}),   // Quito
-                Map.entry("LIM", new double[]{-12.0219, -77.1143}),  // Lima
-                Map.entry("MDE", new double[]{6.1645, -75.4231}),    // Medellín
-                Map.entry("CUN", new double[]{21.0365, -86.8771}),   // Cancún
-                Map.entry("GYE", new double[]{-2.149, -79.883}),     // Guayaquil
-                Map.entry("BUE", new double[]{-34.8222, -58.5358}),  // Buenos Aires (Ezeiza)
-                Map.entry("CDG", new double[]{49.0097, 2.5479}),     // París (Charles de Gaulle)
-                Map.entry("ROM", new double[]{41.8003, 12.2389}),    // Roma (Fiumicino)
-                Map.entry("AMS", new double[]{52.3105, 4.7683}),     // Ámsterdam (Schiphol)
-                Map.entry("BER", new double[]{52.3667, 13.5033}),    // Berlín (Brandenburgo)
-                Map.entry("NYC", new double[]{40.6413, -73.7781}),   // Nueva York (JFK)
-                Map.entry("TOR", new double[]{43.6777, -79.6248})    // Toronto (Pearson)
-        );
-
-        model.addAttribute("origen", origen);
-        model.addAttribute("destino", destino);
-        model.addAttribute("latOrigen", coords.get(origen)[0]);
-        model.addAttribute("lonOrigen", coords.get(origen)[1]);
-        model.addAttribute("latDestino", coords.get(destino)[0]);
-        model.addAttribute("lonDestino", coords.get(destino)[1]);
-
-        return "fragments/modalRutaVuelo :: modalRuta"; // Fragmento Thymeleaf
+        return "fragments/modalRutaVuelo :: modalRuta";
     }
 
 }

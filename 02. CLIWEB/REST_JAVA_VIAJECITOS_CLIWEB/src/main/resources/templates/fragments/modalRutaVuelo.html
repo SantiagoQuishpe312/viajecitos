@@ -2,29 +2,69 @@
 <div th:fragment="modalRuta">
     <div class="modal fade" id="modalRuta" tabindex="-1" aria-labelledby="modalRutaLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalRutaLabel">Ruta de Vuelo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            <div class="modal-content shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalRutaLabel">
+                        Ruta de Vuelo
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
 
-                    <!-- Nombre del trayecto -->
-                    <h6 class="mb-3">Ruta: Nueva York - Londres</h6>
+                    <!-- Título de la ruta -->
+                    <h4 class="text-center mb-3 fw-bold text-uppercase" th:text="'Trayecto: ' + ${vuelo.ciudadOrigenNombre} + ' → ' + ${vuelo.ciudadDestinoNombre}"></h4>
 
-                    <!-- iframe del mapa -->
-                    <div class="map-container" style="height: 400px; border-radius: 10px; border: 1px solid #ccc;">
+                    <!-- Mapa -->
+                    <div class="map-container mb-4 rounded" style="height: 400px; border: 2px solid #dee2e6;">
                         <iframe
-                                src="https://santiagoquishpe312.github.io/maps/?lat1=40.7128&lon1=-74.0060&aero1=JFK&lat2=51.5074&lon2=-0.1278&aero2=Heathrow"
+                                th:src="'https://santiagoquishpe312.github.io/maps/?lat1=' + ${lat1} + '&lon1=' + ${lon1} + '&aero1=' + ${aero1} + '&lat2=' + ${lat2} + '&lon2=' + ${lon2} + '&aero2=' + ${aero2}"
                                 style="width: 100%; height: 100%; border: none; border-radius: 10px;"
                                 loading="lazy"
                                 allowfullscreen>
                         </iframe>
                     </div>
 
-                    <!-- Distancia -->
-                    <p class="text-center mt-3">Distancia estimada: calculada dentro del mapa.</p>
+                    <!-- Resumen del vuelo -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="card-title fw-bold mb-2">Información del Vuelo</h6>
+                                    <ul class="list-unstyled">
+                                        <li><strong>Fecha y hora de salida:</strong>
+                                            <span th:text="${#temporals.format(vuelo.vueloFechaSalida, 'yyyy-MM-dd HH:mm')}"
+                                                  id="salida-vuelo"></span>
+                                        </li>
+                                        <li><strong>Aeropuerto origen:</strong> <span th:text="${vuelo.ciudadOrigenAeropuerto}"></span></li>
+                                        <li><strong>Aeropuerto destino:</strong> <span th:text="${vuelo.ciudadDestinoAeropuerto}"></span></li>
+                                        <li><strong>Precio:</strong> <span th:text="${vuelo.vueloValor} + ' USD'"></span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
 
+                        <!-- Datos calculados -->
+                        <div class="col-md-6">
+                            <div class="card h-100 bg-light shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="card-title fw-bold mb-2">Detalles de la Ruta</h6>
+                                    <ul class="list-unstyled">
+                                        <li><strong>Distancia estimada:</strong> <span id="distanciaCalculada">Cargando...</span></li>
+                                        <li><strong>Hora estimada de arribo:</strong> <span id="horaArribo">Cargando...</span></li>
+                                        <li><strong>Tiempo restante:</strong> <span id="cuentaRegresiva" class="fw-bold text-danger">--</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="datosRuta"
+                         th:attr="data-lat-origen=${lat1},
+                                  data-lon-origen=${lon1},
+                                  data-lat-destino=${lat2},
+                                  data-lon-destino=${lon2},
+                                  data-fecha-salida=${vuelo.vueloFechaSalida}">
+                    </div>
                 </div>
             </div>
         </div>

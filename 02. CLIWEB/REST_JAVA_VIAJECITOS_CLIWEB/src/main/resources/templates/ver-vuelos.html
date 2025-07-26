@@ -270,19 +270,26 @@
 
                 document.getElementById('modalRuta').addEventListener('shown.bs.modal', () => {
                     const datos = document.getElementById('datosRuta');
-                    const origen = [parseFloat(datos.dataset.latOrigen), parseFloat(datos.dataset.lonOrigen)];
-                    const destino = [parseFloat(datos.dataset.latDestino), parseFloat(datos.dataset.lonDestino)];
+                    const lat1 = parseFloat(datos.dataset.latOrigen);
+                    const lon1 = parseFloat(datos.dataset.lonOrigen);
+                    const lat2 = parseFloat(datos.dataset.latDestino);
+                    const lon2 = parseFloat(datos.dataset.lonDestino);
+                    const salidaStr = datos.dataset.fechaSalida;
 
-                    if (map) map.remove();
-                    map = L.map('map').setView(origen, 5);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
-                    L.marker(origen).addTo(map).bindPopup("Origen").openPopup();
-                    L.marker(destino).addTo(map).bindPopup("Destino");
-                    L.polyline([origen, destino], { color: 'red' }).addTo(map);
+                    // Distancia (Haversine)
+                    const distancia = calcularDistancia([lat1, lon1], [lat2, lon2]);
+                    document.getElementById("distanciaCalculada").innerText = distancia + " km";
 
-                    const dist = calcularDistancia(origen, destino);
-                    document.getElementById("distance").innerText = `Distancia aproximada: ${dist} km`;
-                    setTimeout(() => map.invalidateSize(), 300);
+                    // Arribo estimado (asumamos 800 km/h)
+                    const tiempoHoras = distancia / 800;
+                    const salida = new Date(salidaStr);
+                    const llegada = new Date(salida.getTime() + tiempoHoras * 60 * 60 * 1000);
+                    document.getElementById("horaArribo").innerText = llegada.toLocaleString();
+
+                    // Cuenta regresiva
+                    iniciarCuentaRegresiva(salida);
+
+                    // Ajustar mapa
                 }, { once: true });
             });
     }
@@ -294,10 +301,36 @@
         const dLon = toRad(coord2[1] - coord1[1]);
         const lat1 = toRad(coord1[0]);
         const lat2 = toRad(coord2[0]);
-        const a = Math.sin(dLat / 2) ** 2 +
-            Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
-        return (R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)))).toFixed(2);
+        const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+        return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(2);
     }
+    function iniciarCuentaRegresiva(fechaSalida) {
+        const salida = new Date(fechaSalida);
+        const el = document.getElementById("cuentaRegresiva");
+
+        function actualizar() {
+            const ahora = new Date();
+            const diff = salida - ahora;
+
+            if (diff <= 0) {
+                el.innerText = "¡El vuelo ya salió!";
+                return;
+            }
+
+            const totalSegundos = Math.floor(diff / 1000);
+            const dias = Math.floor(totalSegundos / 86400);
+            const horas = Math.floor((totalSegundos % 86400) / 3600);
+            const minutos = Math.floor((totalSegundos % 3600) / 60);
+            const segundos = totalSegundos % 60;
+
+            el.innerText = `${dias} días, ${horas}h ${minutos}m ${segundos}s`;
+
+            setTimeout(actualizar, 1000);
+        }
+
+        actualizar();
+    }
+
 
     function filtrar() {
         let origen = document.getElementById("filtroOrigen").value.toLowerCase();
