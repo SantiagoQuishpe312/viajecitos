@@ -21,8 +21,6 @@ import static ec.edu.monster.util.ApiConstants.API_BASE_PATH;
 
 @Controller
 public class CompraBoletoController {
-    private static final String API_URL = API_BASE_PATH+"/boleto";
-    private final RestTemplate restTemplate = new RestTemplate();
     @Autowired
     private AmortizacionWebService amortizacionWebService;
     @Autowired

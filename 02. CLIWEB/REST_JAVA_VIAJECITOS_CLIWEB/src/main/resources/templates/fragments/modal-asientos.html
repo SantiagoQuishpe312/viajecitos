@@ -53,7 +53,7 @@
                                             <option value="">Seleccionar cliente</option>
                                             <option th:each="c : ${clientesReferidos}"
                                                     th:value="${c.clienteId}"
-                                                    th:text="${c.clienteNombre + ' ' + c.clienteApellido}">
+                                                    th:text="${c.clienteNombre + ' - ' + c.clienteCedula}">
                                             </option>
                                         </select>
 

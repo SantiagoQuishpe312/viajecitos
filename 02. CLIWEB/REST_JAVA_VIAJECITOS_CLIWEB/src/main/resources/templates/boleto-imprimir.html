@@ -115,6 +115,8 @@
         <p><strong>Estado:</strong> <span th:text="${boleto.boleto.boletoEstado}"></span></p>
         <p><strong>Fecha de Compra:</strong> <span th:text="${#temporals.format(boleto.boleto.boletoFechaCompra, 'dd/MM/yyyy HH:mm')}"></span></p>
         <p><strong>Asiento:</strong> Fila <span th:text="${asiento.fila}"></span>, Columna <span th:text="${asiento.columna}"></span> (<span th:text="${asiento.tipo}"></span>)</p>
+        <p><strong>Usuario:</strong>  <span th:text="${asiento.nombreCliente}"></span></p>
+
     </div>
 
     <div class="ruta">
@@ -134,9 +136,22 @@
         </p>
     </div>
 
-    <div class="qr" th:with="qrTexto='Boleto ID: ' + ${boleto.boleto.boletoId} + ' Asiento: Fila ' + ${asiento.fila} + ' Columna ' + ${asiento.columna}">
+    <div class="qr" th:with="
+    qrTexto=
+        'Boleto ID: ' + ${boleto.boleto.boletoId} + '; ' +
+        'Estado: ' + ${boleto.boleto.boletoEstado} + '; ' +
+        'Fecha Compra: ' + ${#temporals.format(boleto.boleto.boletoFechaCompra, 'dd/MM/yyyy HH:mm')} + '; ' +
+        'Usuario: ' + ${asiento.nombreCliente} + '; ' +
+        'Asiento: Fila ' + ${asiento.fila} + ', Columna ' + ${asiento.columna} + ', ' + ${asiento.tipo} + '; ' +
+        'Ruta: ' + ${boleto.cuidadOrigen.ciudadNombre} + ' (' + ${boleto.cuidadOrigen.ciudadCodigo} + ') - ' +
+        ${boleto.ciudadDestino.ciudadNombre} + ' (' + ${boleto.ciudadDestino.ciudadCodigo} + '); ' +
+        'Vuelo ID: ' + ${boleto.vuelo.vueloId} + '; ' +
+        'Salida: ' + ${#temporals.format(boleto.vuelo.vueloFechaSalida, 'dd/MM/yyyy HH:mm')} + '; ' +
+        'Valor: $' + ${#numbers.formatDecimal(boleto.vuelo.vueloValor, 1, 'COMMA', 2, 'POINT')}
+">
         <canvas th:attr="data-qr-text=${qrTexto}"></canvas>
     </div>
+
 </div>
 
 <button onclick="window.print()">Imprimir</button>

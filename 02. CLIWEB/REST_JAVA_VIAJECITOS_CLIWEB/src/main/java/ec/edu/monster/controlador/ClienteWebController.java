@@ -95,7 +95,7 @@ public class ClienteWebController {
 
         List<Vuelo> vuelos = vueloWebService.obtenerTodos();
         model.addAttribute("vuelos", vuelos);
-
+        model.addAttribute("referenteId",cliente.getClienteId());
         return "ver-vuelos";
     }
     @GetMapping("/clientes/referente/{referenteId}")

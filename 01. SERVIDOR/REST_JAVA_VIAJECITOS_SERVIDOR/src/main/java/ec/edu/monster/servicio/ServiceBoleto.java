@@ -1,11 +1,13 @@
 package ec.edu.monster.servicio;
 
+import ec.edu.monster.dto.AsientoDto;
 import ec.edu.monster.dto.BoletoDto;
 import ec.edu.monster.dto.BoletoInfoDto;
 import ec.edu.monster.mapper.AsientoMapper;
 import ec.edu.monster.mapper.BoletoMapper;
 import ec.edu.monster.mapper.CiudadMapper;
 import ec.edu.monster.mapper.VueloMapper;
+import ec.edu.monster.modelo.Asiento;
 import ec.edu.monster.modelo.Boleto;
 import ec.edu.monster.repository.*;
 import jakarta.persistence.EntityNotFoundException;
@@ -87,7 +89,6 @@ public class ServiceBoleto implements IServiceBoleto{
                 .map(boleto -> {
                     BoletoInfoDto dto = new BoletoInfoDto();
 
-                    // Mapear el boleto
                     dto.setBoleto(boletoMapper.toDTO(boleto));
 
                     // Mapear el vuelo
@@ -105,12 +106,24 @@ public class ServiceBoleto implements IServiceBoleto{
                         }
                     }
 // Mapear los asientos
-                    dto.setAsientos(
-                            asientoRepository.findAsientosByBoleto(boleto.getBoletoId())
-                                    .stream()
-                                    .map(asientoMapper::toDTO)
-                                    .collect(Collectors.toList())
-                    );
+                    List<Asiento> asientoList = asientoRepository.findAsientosByBoleto(boleto.getBoletoId());
+
+                    List<AsientoDto> asientoDtoList = asientoList.stream()
+                            .map(asientoMapper::toDTO)
+                            .collect(Collectors.toList());
+
+// Relacionar cada Asiento con su DTO
+                    for (int i = 0; i < asientoDtoList.size(); i++) {
+                        Asiento asiento = asientoList.get(i);
+                        AsientoDto dtoAs = asientoDtoList.get(i);
+
+                        if (asiento.getCliente() != null) {
+                            dtoAs.setNombreCliente(asiento.getCliente().getClienteNombre() +" - "+asiento.getCliente().getClienteCedula());
+                        }
+                    }
+
+
+                    dto.setAsientos(asientoDtoList);
 
                     return dto;
                 })

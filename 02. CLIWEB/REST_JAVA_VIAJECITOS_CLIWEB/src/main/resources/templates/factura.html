@@ -5,194 +5,251 @@
     <title>Factura #<span th:text="${factura.facturaId}"></span></title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-        <style>
-    body { 
-        font-family: Arial, sans-serif; 
-        max-width: 900px; 
-        margin: auto; 
-        color: #333; 
-        padding: 10px;
-    }
-
-    header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    header h1 { 
-        margin: 0; 
-        color: #2c3e50; 
-    }
-
-    header h2 {
-        margin: 5px 0 0;
-        font-weight: normal;
-        color: #555;
-    }
-
-    h2 {
-        color: #2c3e50;
-        border-bottom: 1px solid #ccc;
-        padding-bottom: 5px;
-        margin-top: 40px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-    }
-
-    th, td {
-        border: 1px solid #ccc;
-        padding: 10px;
-    }
-
-    th {
-        background-color: #f2f2f2;
-        text-align: left;
-    }
-
-    td.right {
-        text-align: right;
-    }
-
-    .total-row td {
-        font-weight: bold;
-        font-size: 1.2em;
-    }
-
-    .info p {
-        margin: 3px 0;
-    }
-
-    /* Botones modernos */
-    button, #btnDescargarPdf {
-        background-color: #0d6efd;
-        color: white;
-        border: none;
-        padding: 12px 20px;
-        font-size: 1em;
-        cursor: pointer;
-        border-radius: 6px;
-        transition: background-color 0.3s ease;
-        width: 100%;
-        margin-top: 10px;
-    }
-
-    button:hover, #btnDescargarPdf:hover {
-        background-color: #0b5ed7;
-    }
-
-    /* Responsive: Totales como tarjetas */
-    @media (max-width: 768px) {
-        tfoot {
-            display: grid;
-            gap: 10px;
-        }
-
-        tfoot tr {
-            display: flex;
-            justify-content: space-between;
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: auto;
+            color: #333;
             padding: 10px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        header h2 {
+            margin: 5px 0 0;
+            font-weight: normal;
+            color: #555;
+        }
+
+        h2 {
+            color: #2c3e50;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-top: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
             border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f8f9fa;
+            padding: 10px;
         }
 
-        tfoot td {
-            border: none;
-            padding: 0;
+        th {
+            background-color: #f2f2f2;
             text-align: left;
+        }
+
+        td.right {
+            text-align: right;
+        }
+
+        .total-row td {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .info p {
+            margin: 3px 0;
+        }
+
+        /* Botones modernos */
+        button, #btnDescargarPdf {
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            padding: 12px 20px;
             font-size: 1em;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
         }
 
-        tfoot td strong {
-            display: block;
-            margin-bottom: 4px;
+        button:hover, #btnDescargarPdf:hover {
+            background-color: #0b5ed7;
         }
-    }
-</style>
 
+        /* Responsive: Totales como tarjetas */
+        @media (max-width: 768px) {
+            tfoot {
+                display: grid;
+                gap: 10px;
+            }
+
+            tfoot tr {
+                display: flex;
+                justify-content: space-between;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                background-color: #f8f9fa;
+            }
+
+            tfoot td {
+                border: none;
+                padding: 0;
+                text-align: left;
+                font-size: 1em;
+            }
+
+            tfoot td strong {
+                display: block;
+                margin-bottom: 4px;
+            }
+        }
     </style>
 </head>
 <body>
 
-<header></header>
-
-<div id="facturaContenido">
+<header>
     <h1>Viajecitos SAS</h1>
     <h2>Factura #<span th:text="${factura.facturaId}"></span></h2>
     <p th:text="${fechaFactura != null ? #temporals.format(fechaFactura, 'dd/MM/yyyy HH:mm') : ''}"></p>
+</header>
 
-    <section class="info">
-        <p><strong>Estado:</strong> <span th:text="${factura.estado}"></span></p>
-        <p><strong>Método de pago:</strong> <span th:text="${factura.metodoPago}"></span></p>
-    </section>
+<section class="info">
+    <p><strong>Estado:</strong> <span th:text="${factura.estado}"></span></p>
+    <p><strong>Método de pago:</strong> <span th:text="${factura.metodoPago}"></span></p>
+</section>
 
-    <section class="cliente">
-        <h2>Cliente</h2>
-        <p><strong>Nombre:</strong> <span th:text="${cliente.clienteNombre}"></span></p>
-        <p><strong>Email:</strong> <span th:text="${cliente.clienteEmail}"></span></p>
-        <p><strong>Teléfono:</strong> <span th:text="${cliente.clienteTelefono}"></span></p>
-        <p><strong>Cédula:</strong> <span th:text="${cliente.clienteCedula}"></span></p>
-    </section>
+<section class="cliente">
+    <h2>Cliente</h2>
+    <p><strong>Nombre:</strong> <span th:text="${cliente.clienteNombre}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${cliente.clienteEmail}"></span></p>
+    <p><strong>Teléfono:</strong> <span th:text="${cliente.clienteTelefono}"></span></p>
+    <p><strong>Cédula:</strong> <span th:text="${cliente.clienteCedula}"></span></p>
+</section>
 
-    <section class="detalle-boletos">
-        <h2>Detalle de Boletos</h2>
-        <table id="tablaFactura">
-            <thead>
-            <tr>
-                <th>Cantidad</th>
-                <th>Descripción</th>
-                <th>Precio Unitario</th>
-                <th>Total</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="item : ${boleto}">
-                <td data-label="Cantidad" th:text="${item.boleto.boletoCantidad}"></td>
-                <td data-label="Descripción">
-                    <span>ID Vuelo: </span><span th:text="${item.vuelo.vueloId}"></span><br/>
-                    <span th:text="${item.cuidadOrigen.ciudadNombre}"></span> (<span th:text="${item.cuidadOrigen.ciudadCodigo}"></span>) a
-                    <span th:text="${item.ciudadDestino.ciudadNombre}"></span> (<span th:text="${item.ciudadDestino.ciudadCodigo}"></span>)<br/>
-                    <small th:text="${item.vuelo.vueloFechaSalida != null ? #temporals.format(item.vuelo.vueloFechaSalida, 'dd/MM/yyyy HH:mm') : ''}"></small>
-                </td>
-                <td data-label="Precio Unitario" class="right" th:text="${item.vuelo.vueloValor}"></td>
-                <td data-label="Total" class="right" th:text="${item.vuelo.vueloValor * item.boleto.boletoCantidad}"></td>
-            </tr>
-            </tbody>
-            <tfoot>
-            <tr>
-                <td colspan="3" class="right"><strong>Subtotal</strong></td>
-                <td class="right" th:text="${factura.subtotal}"></td>
-            </tr>
-            <tr>
-                <td colspan="3" class="right"><strong>IVA</strong></td>
-                <td class="right" th:text="${factura.iva}"></td>
-            </tr>
-            <tr class="total-row">
-                <td colspan="3" class="right"><strong>Total</strong></td>
-                <td class="right" th:text="${factura.total}"></td>
-            </tr>
-            </tfoot>
-        </table>
-    </section>
-</div>
+<section class="detalle-boletos">
+    <h2>Detalle de Boletos</h2>
+    <table id="tablaFactura">
+        <thead>
+        <tr>
+            <th>Cantidad</th>
+            <th>Descripción</th>
+            <th>Precio Unitario</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${boleto}">
+            <td data-label="Cantidad" th:text="${item.boleto.boletoCantidad}"></td>
+            <td data-label="Descripción">
+                <span>ID Vuelo: </span><span th:text="${item.vuelo.vueloId}"></span><br/>
+                <span th:text="${item.cuidadOrigen.ciudadNombre}"></span> (<span th:text="${item.cuidadOrigen.ciudadCodigo}"></span>) a
+                <span th:text="${item.ciudadDestino.ciudadNombre}"></span> (<span th:text="${item.ciudadDestino.ciudadCodigo}"></span>)<br/>
+                <small th:text="${item.vuelo.vueloFechaSalida != null ? #temporals.format(item.vuelo.vueloFechaSalida, 'dd/MM/yyyy HH:mm') : ''}"></small>
+            </td>
+            <td data-label="Precio Unitario" class="right" th:text="${item.vuelo.vueloValor}"></td>
+            <td data-label="Total" class="right" th:text="${item.vuelo.vueloValor * item.boleto.boletoCantidad}"></td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="3" class="right"><strong>Subtotal</strong></td>
+            <td class="right" th:text="${factura.subtotal}"></td>
+        </tr>
+        <tr>
+            <td colspan="3" class="right"><strong>IVA</strong></td>
+            <td class="right" th:text="${factura.iva}"></td>
+        </tr>
+        <tr class="total-row">
+            <td colspan="3" class="right"><strong>Total</strong></td>
+            <td class="right" th:text="${factura.total}"></td>
+        </tr>
+        </tfoot>
+    </table>
+</section>
 
 <button id="btnDescargarPdf" type="button">Descargar PDF</button>
 
-<!-- Scripts originales conservados -->
+<!-- Scripts para generación PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
-<!-- Tu mismo JS para amortización y PDF (sin cambios) -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById('btnDescargarPdf').addEventListener('click', async () => {
+            const element = document.getElementById('facturaContenido') || document.body; // fallback
+            const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+            const margin = 10;
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const imgWidth = pageWidth - margin * 2;
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+
+            if (imgHeight <= pageHeight - margin * 2) {
+                pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
+            } else {
+                const totalPages = Math.ceil(imgHeight / (pageHeight - margin * 2));
+                const pageCanvas = document.createElement("canvas");
+                const ctx = pageCanvas.getContext("2d");
+                const pageHeightPx = (canvas.width / imgWidth) * (pageHeight - margin * 2);
+                pageCanvas.width = canvas.width;
+                pageCanvas.height = pageHeightPx;
+
+                for (let i = 0; i < totalPages; i++) {
+                    ctx.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+                    ctx.drawImage(canvas, 0, i * pageHeightPx, canvas.width, pageHeightPx, 0, 0, canvas.width, pageHeightPx);
+                    const img = pageCanvas.toDataURL('image/png');
+                    if (i > 0) pdf.addPage();
+                    pdf.addImage(img, 'PNG', margin, margin, imgWidth, pageHeight - margin * 2);
+                }
+            }
+
+            pdf.save('Factura_Viajecitos.pdf');
+        });
+    });
+</script>
+
+<!-- Tabla amortización (si aplica) -->
+<div th:if="${factura.metodoPago == 'CREDITO'}" style="margin-top: 20px;">
+    <button type="button" id="btnVerAmortizacion" style="width: 100%; background-color: #27ae60; color: white; border: none; padding: 12px 20px; border-radius: 6px; font-size: 1em; cursor: pointer;">
+        Ver Amortización
+    </button>
+
+    <div id="contenedorTablaAmortizacion" style="display: none; margin-top: 15px;">
+        <h2>Tabla de Amortización (Crédito directo)</h2>
+        <table id="tablaAmortizacion" style="width: 100%; border-collapse: collapse;">
+            <thead>
+            <tr>
+                <th>Cuota</th>
+                <th>Valor Cuota</th>
+                <th>Interés</th>
+                <th>Capital</th>
+                <th>Saldo</th>
+            </tr>
+            </thead>
+            <tbody id="tablaAmortizacionBody"></tbody>
+        </table>
+        <button id="btnDescargarAmortizacionPdf" style="margin-top: 15px; background-color: #0d6efd; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer;">
+            Descargar tabla de amortización (PDF)
+        </button>
+    </div>
+</div>
 
 <script th:inline="javascript">
     const totalFinanciado = [[${credito.montoFinanciado}]];
     const numCuotas = [[${credito.numeroCuotas}]];
-    const tipoAmortizacion = [[${#strings.escapeJavaScript(credito.tipoAmortizacion)}]];
+    const tipoAmortizacion = '[[${credito.tipoAmortizacion}]]';
 </script>
 
 <script>
@@ -232,8 +289,9 @@
             });
         }
 
-        document.getElementById('btnDescargarPdf').addEventListener('click', async () => {
-            const element = document.getElementById('facturaContenido');
+        document.getElementById('btnDescargarAmortizacionPdf')?.addEventListener('click', async () => {
+            const element = document.getElementById('contenedorTablaAmortizacion');
+            if (!element) return;
             const canvas = await html2canvas(element, { scale: 2, useCORS: true });
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -263,34 +321,10 @@
                 }
             }
 
-            pdf.save('Factura_Viajecitos.pdf');
+            pdf.save('Tabla_Amortizacion.pdf');
         });
     });
 </script>
-
-<!-- Tabla amortización (idéntica) -->
-<div th:if="${factura.metodoPago == 'CREDITO'}">
-    <button type="button" id="btnVerAmortizacion" style="width: 100%; background-color: #27ae60; margin-top: 20px;">
-        Ver Amortización
-    </button>
-
-    <div id="contenedorTablaAmortizacion" style="display: none;">
-        <h2>Tabla de Amortización (Crédito directo)</h2>
-        <table id="tablaAmortizacion">
-            <thead>
-            <tr>
-                <th>Cuota</th>
-                <th>Valor Cuota</th>
-                <th>Interés</th>
-                <th>Capital</th>
-                <th>Saldo</th>
-            </tr>
-            </thead>
-            <tbody id="tablaAmortizacionBody"></tbody>
-        </table>
-        <button id="btnDescargarAmortizacionPdf" style="margin-top: 15px;">Descargar tabla de amortización (PDF)</button>
-    </div>
-</div>
 
 </body>
 </html>

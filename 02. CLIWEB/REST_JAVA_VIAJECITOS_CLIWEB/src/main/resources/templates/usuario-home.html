@@ -1,101 +1,137 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
-    <title>Panel Usuario</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" th:href="@{/css/estilos-navbar.css}" />
+    <title>Panel Usuario - Aerolínea</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
+        /* Reset y base */
         * {
             box-sizing: border-box;
         }
-
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
             margin: 0;
-            padding: 0;
-            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0d47a1 0%, #1976d2 100%);
+            color: #f0f4f8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
+        /* Navbar */
         nav {
-            background-color: #0d6efd;
-            padding: 10px 20px;
-            color: white;
-            font-family: Arial, sans-serif;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin-right: 15px;
+            width: 100%;
+            background-color: rgba(13, 110, 253, 0.9);
+            padding: 12px 30px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
             font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 25px;
         }
-
-        nav a:hover {
+        nav a {
             color: #ffc107;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        nav a:hover {
+            color: #fff176;
         }
 
+        /* Título */
         h2 {
-            color: #333;
-            margin-top: 30px;
-            font-size: 1.8rem;
+            margin: 40px 0 20px;
+            font-size: 2.4rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+        }
+        h2 span {
+            color: #ffeb3b;
+            text-transform: capitalize;
         }
 
+        /* Contenedor botones */
         .botones-container {
             display: flex;
-            justify-content: center;
+            gap: 30px;
             flex-wrap: wrap;
-            gap: 15px;
-            margin: 30px auto;
-            padding: 0 20px;
-            max-width: 600px;
+            justify-content: center;
+            max-width: 700px;
+            width: 90%;
         }
 
+        /* Botones */
         .boton {
-            flex: 1 1 45%;
-            min-width: 140px;
-            padding: 15px 20px;
-            font-size: 16px;
-            background-color: #2E86C1;
-            color: white;
+            background: linear-gradient(145deg, #42a5f5, #1e88e5);
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
+            padding: 18px 36px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
             cursor: pointer;
-            transition: background-color 0.3s;
+            box-shadow: 0 6px 10px rgba(30, 136, 229, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background 0.3s ease, transform 0.2s ease;
+            min-width: 180px;
+            justify-content: center;
         }
-
         .boton:hover {
-            background-color: #1A5276;
+            background: linear-gradient(145deg, #1e88e5, #42a5f5);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px rgba(30, 136, 229, 0.8);
+        }
+        .boton i {
+            font-size: 1.4rem;
         }
 
-        @media (max-width: 480px) {
+        /* Responsive */
+        @media (max-width: 600px) {
             h2 {
-                font-size: 1.4rem;
+                font-size: 1.8rem;
+                margin: 30px 0 15px;
             }
-
             .boton {
-                flex: 1 1 100%;
-                font-size: 15px;
-                padding: 12px;
-            }
-
-            .botones-container {
-                gap: 10px;
+                min-width: 100%;
+                font-size: 1rem;
+                padding: 15px 20px;
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
-<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<nav th:replace="~{fragments/navbar :: navbar}">
+    <!-- En caso no uses fragmentos, puedes poner links aquí -->
+    <a href="/home">Inicio</a>
+    <a href="/perfil">Perfil</a>
+    <a href="/salir">Cerrar sesión</a>
+</nav>
 
 <h2>Bienvenido, <span th:text="${session.cliente.clienteNombre}">Usuario</span></h2>
 
 <div class="botones-container">
-    <button class="boton" onclick="location.href='/mis-boletos'">Ver mis Boletos</button>
-    <button class="boton" onclick="location.href='/vuelos'">Ver Vuelos</button>
-    <button class="boton" onclick="location.href='/facturas'">Mis Facturas</button>
+    <button class="boton" onclick="location.href='/mis-boletos'">
+        <i class="fa-solid fa-ticket"></i> Mis Boletos
+    </button>
+    <button class="boton" onclick="location.href='/vuelos'">
+        <i class="fa-solid fa-plane-departure"></i> Vuelos
+    </button>
+    <button class="boton" onclick="location.href='/facturas'">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Facturas
+    </button>
 </div>
+
 </body>
 </html>

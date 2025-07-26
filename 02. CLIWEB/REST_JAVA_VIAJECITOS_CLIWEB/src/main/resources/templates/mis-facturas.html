@@ -1,75 +1,129 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Mis Facturas</title>
+
     <link rel="stylesheet" th:href="@{/css/estilos-navbar.css}" />
 
     <style>
+        /* Reset y base */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
             margin: 0;
             padding: 20px;
+            color: #333;
         }
 
         h1 {
             color: #2c3e50;
             text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
         }
 
+        /* Contenedor tabla con scroll horizontal en móvil */
         .table-container {
             overflow-x: auto;
-            margin-top: 20px;
+            box-shadow: 0 4px 10px rgb(0 0 0 / 0.1);
+            border-radius: 8px;
+            background: white;
+            padding: 10px;
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
             min-width: 600px;
-            background-color: white;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.95rem;
+        }
+
+        thead tr {
+            background-color: #007bff;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
         }
 
         th, td {
-            border: 1px solid #ddd;
-            padding: 12px 10px;
+            padding: 12px 15px;
             text-align: left;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
         }
 
-        th {
-            background-color: #e9ecef;
-            color: #343a40;
+        tbody tr:hover {
+            background-color: #f1f5f9;
         }
 
-        tr:nth-child(even) {
-            background-color: #f8f9fa;
+        tr:last-child td {
+            border-bottom: none;
         }
 
         td.right {
             text-align: right;
+            font-weight: 600;
         }
 
+        /* Botón ver detalle */
         .btn-detalle {
             display: inline-block;
-            padding: 6px 12px;
-            background-color: #0d6efd;
+            padding: 6px 14px;
+            background-color: #007bff;
             color: white;
+            border-radius: 5px;
             text-decoration: none;
-            border-radius: 4px;
+            font-weight: 600;
+            transition: background-color 0.25s ease;
             font-size: 0.9rem;
-            transition: background-color 0.2s;
+            user-select: none;
         }
 
-        .btn-detalle:hover {
-            background-color: #0b5ed7;
+        .btn-detalle:hover,
+        .btn-detalle:focus {
+            background-color: #0056b3;
+            outline: none;
         }
 
+        /* Mensaje sin facturas */
         p {
             text-align: center;
-            margin-top: 30px;
-            font-size: 1.1rem;
+            margin-top: 3rem;
+            font-size: 1.2rem;
             color: #555;
+            font-style: italic;
+            user-select: none;
+        }
+
+        /* Responsive para pantallas pequeñas */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 10px 8px;
+            }
+
+            .btn-detalle {
+                padding: 5px 10px;
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
@@ -103,7 +157,7 @@
             <td th:text="${factura.factura.metodoPago}"></td>
             <td class="right" th:text="${#numbers.formatDecimal(factura.factura.total, 1, 'COMMA', 2, 'POINT')}"></td>
             <td>
-                <a th:href="@{/factura/{id}(id=${factura.factura.facturaId})}" class="btn-detalle">Ver detalle</a>
+                <a th:href="@{/factura/{id}(id=${factura.factura.facturaId})}" class="btn-detalle" tabindex="0">Ver detalle</a>
             </td>
         </tr>
         </tbody>

@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class Asiento {
     private Integer asientoId;
+    private String nombreCliente;
     private Integer vueloId;
     private Integer fila;
     private String columna;
