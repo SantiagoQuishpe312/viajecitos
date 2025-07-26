@@ -14,6 +14,7 @@ import java.util.List;
 public class Cliente {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CLIENTE_ID")
     private Integer clienteId;
 
@@ -50,13 +51,14 @@ public class Cliente {
     public enum Genero {
         M, F
     }
-    @OneToMany(mappedBy = "clienteReferente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Cliente> clientesReferidos;
 
     @ManyToOne
     @JoinColumn(name = "CLIENTE_REFERENTE_ID")
     private Cliente clienteReferente;
-    
+
+    @OneToMany(mappedBy = "clienteReferente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Cliente> clientesReferidos;
+
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Asiento> asientos;
 

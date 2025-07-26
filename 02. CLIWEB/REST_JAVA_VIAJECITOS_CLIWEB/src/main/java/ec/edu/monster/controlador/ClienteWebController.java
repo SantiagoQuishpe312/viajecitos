@@ -4,6 +4,7 @@ import ec.edu.monster.modelo.*;
 import ec.edu.monster.servicio.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +18,12 @@ public class ClienteWebController {
 
     @Autowired
     private FacturaWebService facturaWebService;
-    @Autowired
-    private ClienteWebService clienteWebService;
 
     @Autowired
     private VueloWebService vueloWebService;
+
+    @Autowired
+    private ClienteWebService clienteWebService;
 
     @Autowired
     private BoletoWebService boletoWebService;
@@ -96,14 +98,29 @@ public class ClienteWebController {
 
         return "ver-vuelos";
     }
+    @GetMapping("/clientes/referente/{referenteId}")
+    @ResponseBody
+    public ResponseEntity<List<Cliente>> obtenerReferidos(@PathVariable Integer referenteId) {
+        return clienteWebService.obtenerClientesReferidos(referenteId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/clientes")
+    @ResponseBody
+    public ResponseEntity<Cliente> crearCliente(@RequestBody Cliente cliente) {
+        Cliente nuevo = clienteWebService.guardarCliente(cliente);
+        return ResponseEntity.ok(nuevo);
+    }
 
     @GetMapping("/asientos/vuelo/{vueloId}")
-    public String modalAsientos(@PathVariable Integer vueloId, Model model , HttpSession session) {
-        Cliente cliente = (Cliente) session.getAttribute("cliente");
-        if (cliente == null) return "redirect:/login";
+    public String modalAsientos(@PathVariable Integer vueloId, Model model, HttpSession session) {
         List<Asiento> lista = asientoWebService.obtenerPorVuelo(vueloId)
                 .orElse(Collections.emptyList());
-
+        Cliente cliente = (Cliente) session.getAttribute("cliente");
+        if (cliente == null) {
+            return "redirect:/login";
+        }
         Comparator<String> numericStringComparator = (s1, s2) -> {
             try {
                 return Integer.valueOf(s1).compareTo(Integer.valueOf(s2));
@@ -124,14 +141,7 @@ public class ClienteWebController {
 
             asientoMap.computeIfAbsent(filaStr, k -> new HashMap<>()).put(col, a);
         }
-        List<Cliente> referidos = clienteWebService
-                .obtenerClientesReferidos(cliente.getClienteId())
-                .orElse(Collections.emptyList());
-
-        // ya cargas filas/columnas/asientos
-        model.addAttribute("clientesReferidos", referidos);
-        model.addAttribute("vueloId", vueloId);
-
+        model.addAttribute("referenteId",cliente.getClienteId());
         model.addAttribute("vueloId", vueloId);
         model.addAttribute("rows", rows);
         model.addAttribute("cols", cols);

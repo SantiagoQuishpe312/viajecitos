@@ -47,28 +47,24 @@ public class CompraBoletoController {
         boleto.setBoletoFechaCompra(java.time.LocalDateTime.now());
 
         Optional<Boleto> boletoCreadoOpt = Optional.ofNullable(boletoWebService.comprarBoleto(boleto));
-
         if (boletoCreadoOpt.isEmpty()) {
             model.addAttribute("error", "Error al crear el boleto.");
             return "redirect:/vuelos";
         }
 
         Integer boletoId = boletoCreadoOpt.get().getBoletoId();
-        ObjectMapper mapper = new ObjectMapper();
-        Map<Integer, Integer> clientePorAsiento = new HashMap<>();
 
+        // Parsear el JSON recibido con relaciones asiento -> cliente
+        Map<Integer, Integer> relaciones = new HashMap<>();
         try {
-            clientePorAsiento = mapper.readValue(
-                    dto.getClientePorAsientoJson(),
-                    new TypeReference<Map<Integer, Integer>>() {});
+            relaciones = new ObjectMapper().readValue(dto.getClientePorAsientoJson(), new TypeReference<>() {});
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        // Reservar cada asiento seleccionado
         for (Integer asientoId : dto.getAsientos()) {
-            Integer clienteRelacionadoId = clientePorAsiento.getOrDefault(asientoId, cliente.getClienteId());
-            asientoWebService.reservar(asientoId, boletoId, clienteRelacionadoId);
+            Integer clienteAsignado = relaciones.getOrDefault(asientoId, cliente.getClienteId());
+            asientoWebService.reservar(asientoId, boletoId, clienteAsignado);
         }
 
         session.setAttribute("asientosSeleccionados", dto.getAsientos());
@@ -78,6 +74,7 @@ public class CompraBoletoController {
                 ? "redirect:/vuelos"
                 : "redirect:/carrito/" + cliente.getClienteId();
     }
+
 
     @GetMapping("/carrito/{idCliente}")
     public String verCarritoBoletos(HttpSession session, Model model) {

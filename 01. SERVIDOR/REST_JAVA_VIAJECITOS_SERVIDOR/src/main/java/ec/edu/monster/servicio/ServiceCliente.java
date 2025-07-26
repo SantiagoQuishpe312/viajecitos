@@ -23,6 +23,10 @@ public class ServiceCliente implements IServiceCliente {
     @Override
     public ClienteDto guardarCliente(ClienteDto clienteDto) {
         Cliente cliente = clienteMapper.toEntity(clienteDto);
+        if (cliente.getClientesReferidos() == null || cliente.getClientesReferidos().isEmpty()) {
+            cliente.setClienteReferente(clienteRepository.getById(1));
+        }
+        cliente.setClienteContrasena(cliente.getClienteCedula());
         Cliente guardado = clienteRepository.save(cliente);
         return clienteMapper.toDTO(guardado);
     }

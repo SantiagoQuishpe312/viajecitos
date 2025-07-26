@@ -1,0 +1,44 @@
+<div th:fragment="modalNuevoCliente">
+    <div class="modal fade" id="modalNuevoCliente" tabindex="-1" aria-hidden="true" aria-labelledby="modalNuevoClienteLabel">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalNuevoClienteLabel">Nuevo Cliente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form id="formNuevoCliente">
+                        <input type="hidden" id="modalAsientoId" />
+
+                        <div class="mb-3">
+                            <label for="inputNuevoCliente" class="form-label">Nombre</label>
+                            <input type="text" id="inputNuevoCliente" class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="inputCedula" class="form-label">Cédula</label>
+                            <input type="text" id="inputCedula" class="form-control" required />
+                        </div>
+
+                        <fieldset class="mb-3">
+                            <legend>Género</legend>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="genero" id="generoM" value="M" checked />
+                                <label class="form-check-label" for="generoM">Masculino</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="genero" id="generoF" value="F" />
+                                <label class="form-check-label" for="generoF">Femenino</label>
+                            </div>
+                        </fieldset>
+
+                        <button type="submit" class="btn btn-success">Guardar Cliente</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

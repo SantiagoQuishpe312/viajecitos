@@ -8,6 +8,5 @@ public class AsientosSeleccionados {
     private Integer vueloId;
     private List<Integer> asientos;
     private String accion;  // "seguir" o "pagar"
-    private String clientePorAsientoJson; // nuevo
-
+    private String clientePorAsientoJson; // Aquí se guarda el JSON como String
 }

@@ -4,11 +4,15 @@
     <meta charset="UTF-8" />
     <title>Vuelos disponibles</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Bootstrap 5 -->
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-
     <style>
+        /* Asegurar modal nuevo cliente arriba */
+        #modalNuevoCliente.modal.show {
+            z-index: 1060 !important; /* Más alto que modal asientos (1050) */
+        }
+
+        /* Opcional estilos de asiento */
         .asiento {
             width: 40px;
             height: 40px;
@@ -22,169 +26,59 @@
             border-radius: 4px;
             font-weight: bold;
         }
-
-        .asiento input[type=checkbox] {
-            display: none;
-        }
-
-        .asiento label {
-            cursor: pointer;
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-
-        .asiento input[type=checkbox]:checked + label {
-            background-color: #0275d8;
-            color: white;
-        }
-
-        .asiento.ocupado {
-            background-color: #d9534f;
-            color: white;
-            cursor: not-allowed;
-        }
-
-        .asiento.reservado {
-            background-color: #f0ad4e;
-            color: black;
-            cursor: not-allowed;
-        }
-
-        .asiento.pagado {
-            background-color: #d9534f;
-            color: white;
-            cursor: not-allowed;
-        }
-
-        .fila {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        @media (max-width: 768px) {
-            .table-responsive {
-                overflow-x: auto;
-            }
-        }
-
-        input[type="text"], input[type="date"] {
-            max-width: 250px;
-        }
+        .asiento.ocupado { background-color: #d9534f; color: white; cursor: not-allowed; }
+        .asiento.reservado { background-color: #f0ad4e; color: black; cursor: not-allowed; }
+        .asiento.pagado { background-color: #d9534f; color: white; cursor: not-allowed; }
+        .fila { display: flex; justify-content: center; flex-wrap: wrap; }
+        @media (max-width: 768px) { .table-responsive { overflow-x: auto; } }
+        input[type="text"], input[type="date"] { max-width: 250px; }
     </style>
 </head>
 <body>
 <div th:replace="~{fragments/navbar :: navbar}"></div>
+<div th:replace="~{fragments/modalNuevoCliente :: modalNuevoCliente}"></div>
 
 <div class="container mt-4">
     <h2 class="text-center mb-4">Vuelos Disponibles</h2>
 
-    <!-- Filtros -->
     <div class="row g-3 mb-4">
-        <div class="col-md-4 col-sm-12">
-            <input type="text" id="filtroOrigen" class="form-control" placeholder="Filtrar por origen..." onkeyup="filtrar()" />
-        </div>
-        <div class="col-md-4 col-sm-12">
-            <input type="text" id="filtroDestino" class="form-control" placeholder="Filtrar por destino..." onkeyup="filtrar()" />
-        </div>
-        <div class="col-md-4 col-sm-12">
-            <input type="date" id="filtroFecha" class="form-control" oninput="filtrar()" />
-        </div>
+        <div class="col-md-4"><input type="text" id="filtroOrigen" class="form-control" placeholder="Filtrar por origen..." onkeyup="filtrar()" /></div>
+        <div class="col-md-4"><input type="text" id="filtroDestino" class="form-control" placeholder="Filtrar por destino..." onkeyup="filtrar()" /></div>
+        <div class="col-md-4"><input type="date" id="filtroFecha" class="form-control" oninput="filtrar()" /></div>
     </div>
 
-    <!-- Tabla -->
     <div class="table-responsive">
-        <table id="tablaVuelos" class="table table-striped table-bordered text-center align-middle">
+        <table id="tablaVuelos" class="table table-bordered text-center align-middle">
             <thead class="table-light">
-                <tr>
-                    <th>Origen</th>
-                    <th>Destino</th>
-                    <th>Fecha y Hora</th>
-                    <th>Capacidad</th>
-                    <th>Disponibles</th>
-                    <th>Precio</th>
-                    <th>Acción</th>
-                </tr>
+            <tr><th>Origen</th><th>Destino</th><th>Fecha y Hora</th><th>Capacidad</th><th>Disponibles</th><th>Precio</th><th>Acción</th></tr>
             </thead>
             <tbody>
-                <tr th:each="vuelo : ${vuelos}"
-                    th:if="${vuelo.vueloEstado == 'ACTIVO'} and ${vuelo.vueloFechaSalida} >= ${T(java.time.LocalDateTime).now()}">
-                    <td hidden="hidden" th:text="${vuelo.ciudadOrigenCodigo}"></td>
-                    <td hidden="hidden" th:text="${vuelo.ciudadDestinoCodigo}"></td>                  <td hidden="hidden" th:text="${vuelo.ciudadOrigenCodigo}"></td>
-                    <td th:text="${vuelo.ciudadOrigenNombre}"></td>                  <td hidden="hidden" th:text="${vuelo.ciudadOrigenCodigo}"></td>
-                    <td th:text="${vuelo.ciudadDestinoNombre}"></td>
-                    <td th:text="${#temporals.format(vuelo.vueloFechaSalida, 'yyyy-MM-dd HH:mm')}"></td>
-                    <td th:text="${vuelo.totalAsientos}"></td>
-                    <td th:text="${vuelo.asientosDisponibles}"></td>
-                    <td th:text="${vuelo.vueloValor} + ' USD'"></td>
-                    <td>
-                        <button type="button" class="btn btn-primary btn-sm"
-                            th:attr="onclick='abrirModal(' + ${vuelo.vueloId} + ')'">
-                            Comprar
-                        </button>
-                        <button type="button" class="btn btn-outline-info btn-sm mt-1"
-                                th:attr="onclick='verRutaVuelo(' + ${vuelo.vueloId} + ')'">
-                            Ver Ruta
-                        </button>
-                    </td>
-                </tr>
+            <tr th:each="vuelo : ${vuelos}" th:if="${vuelo.vueloEstado == 'ACTIVO'} and ${vuelo.vueloFechaSalida} >= ${T(java.time.LocalDateTime).now()}">
+                <td th:text="${vuelo.ciudadOrigenNombre}"></td>
+                <td th:text="${vuelo.ciudadDestinoNombre}"></td>
+                <td th:text="${#temporals.format(vuelo.vueloFechaSalida, 'yyyy-MM-dd HH:mm')}"></td>
+                <td th:text="${vuelo.totalAsientos}"></td>
+                <td th:text="${vuelo.asientosDisponibles}"></td>
+                <td th:text="${vuelo.vueloValor + ' USD'}"></td>
+                <td>
+                    <button class="btn btn-primary btn-sm" th:attr="onclick=|abrirModal(${vuelo.vueloId})|">Comprar</button>
+                    <button class="btn btn-outline-info btn-sm mt-1" th:attr="onclick=|verRutaVuelo(${vuelo.vueloId})|">Ver Ruta</button>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
 </div>
 
-<!-- Modal container -->
+<!-- Contenedor donde cargarás el modal de asientos y ruta vuelo -->
 <div id="modalContainer"></div>
 
-<!-- Scripts -->
+<!-- Bootstrap & Leaflet JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    function abrirModal(vueloId) {
-        fetch('/asientos/vuelo/' + vueloId)
-            .then(r => r.text())
-            .then(html => {
-                const cont = document.getElementById('modalContainer');
-                cont.innerHTML = html;
-
-                const modalElement = document.getElementById('modalAsientos');
-                if (modalElement) {
-                    const modal = new bootstrap.Modal(modalElement);
-                    modal.show();
-                }
-            });
-    }
-
-    function cerrarModal() {
-        document.getElementById('modalContainer').innerHTML = '';
-    }
-
-    function filtrar() {
-        let origen = document.getElementById("filtroOrigen").value.toLowerCase();
-        let destino = document.getElementById("filtroDestino").value.toLowerCase();
-        let fecha = document.getElementById("filtroFecha").value;
-
-        let filas = document.querySelectorAll("#tablaVuelos tbody tr");
-
-        filas.forEach(fila => {
-            let td = fila.querySelectorAll("td");
-
-            let textoOrigen = td[0]?.innerText.toLowerCase() || "";
-            let textoDestino = td[1]?.innerText.toLowerCase() || "";
-            let textoFecha = td[2]?.innerText.slice(0, 10) || "";
-
-            let coincideOrigen = textoOrigen.includes(origen);
-            let coincideDestino = textoDestino.includes(destino);
-            let coincideFecha = !fecha || textoFecha === fecha;
-
-            fila.style.display = (coincideOrigen && coincideDestino && coincideFecha) ? "" : "none";
-        });
-    }
-</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
-    // Iconos desde CDN
+    // Config Leaflet icon
     L.Icon.Default.mergeOptions({
         iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
         shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
@@ -192,39 +86,202 @@
     });
 
     let map;
+    const relaciones = {};
+
+    // Abre modal de asientos y carga clientes para cada asiento
+    function abrirModal(vueloId) {
+        fetch('/asientos/vuelo/' + vueloId)
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('modalContainer').innerHTML = html;
+                const modal = new bootstrap.Modal(document.getElementById('modalAsientos'));
+                modal.show();
+
+                // Una vez abierto, inicializar eventos y cargar clientes por asiento
+                setTimeout(() => {
+                    detectarSeleccionAsientos();
+                    actualizarContadorSeleccionados();
+                    prepararEnvioFormulario();
+                    cargarClientesPorAsientos();
+                }, 300);
+            });
+    }
+
+    // Carga clientes referidos para TODOS los selects de clientes en el modal de asientos
+    function cargarClientesPorAsientos() {
+        // Obtener todos los selects clientes por asiento
+        document.querySelectorAll('select.seleccionar-cliente').forEach(select => {
+            const asientoId = select.getAttribute('data-asiento-id');
+            // Limpiar opciones excepto la opción "Seleccionar cliente"
+            select.innerHTML = '<option value="">Seleccionar cliente</option>';
+
+            // Aquí debes ajustar el referenteId si lo tienes dinámico, ahora fijo 1
+            fetch('/clientes/referente/1')
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(cliente => {
+                        const opt = document.createElement('option');
+                        opt.value = cliente.clienteId;
+                        opt.textContent = cliente.clienteNombre + (cliente.clienteApellido ? ' ' + cliente.clienteApellido : '');
+                        select.appendChild(opt);
+                    });
+                })
+                .catch(e => console.error("Error cargando clientes: ", e));
+        });
+    }
+
+    // Detecta cuando seleccionas un asiento y muestra selector cliente
+    function detectarSeleccionAsientos() {
+        document.querySelectorAll('#formAsientos input[type="checkbox"][name="asientos"]').forEach(cb => {
+            cb.addEventListener('change', () => {
+                const asientoId = cb.getAttribute('data-asiento-id');
+                const formCliente = document.getElementById('form-cliente-' + asientoId);
+
+                if (cb.checked) {
+                    formCliente.style.display = 'block';
+                } else {
+                    formCliente.style.display = 'none';
+                    const select = document.getElementById('select-cliente-' + asientoId);
+                    if (select) select.value = '';
+                }
+
+                actualizarContadorSeleccionados();
+            });
+        });
+    }
+
+    // Actualiza el contador de asientos seleccionados
+    function actualizarContadorSeleccionados() {
+        const seleccionados = document.querySelectorAll('#formAsientos input[type="checkbox"][name="asientos"]:checked').length;
+        const contador = document.getElementById('contadorSeleccion');
+        if (contador) contador.textContent = seleccionados;
+    }
+
+    // Limpia la selección de todos los asientos y clientes
+    function limpiarSeleccion() {
+        document.querySelectorAll('#formAsientos input[type="checkbox"][name="asientos"]').forEach(cb => {
+            cb.checked = false;
+            const asientoId = cb.getAttribute('data-asiento-id');
+            const formCliente = document.getElementById('form-cliente-' + asientoId);
+            if (formCliente) formCliente.style.display = 'none';
+
+            const select = document.getElementById('select-cliente-' + asientoId);
+            if (select) select.value = '';
+        });
+        actualizarContadorSeleccionados();
+    }
+
+    // Prepara JSON con relación asiento->cliente antes de enviar formulario
+    function prepararEnvioFormulario() {
+        const form = document.getElementById('formAsientos');
+        if (!form) return;
+
+        form.addEventListener('submit', function () {
+            const relaciones = {};
+            document.querySelectorAll('.seleccionar-cliente').forEach(select => {
+                const asientoId = select.getAttribute('data-asiento-id');
+                const clienteId = select.value;
+                if (clienteId) relaciones[asientoId] = clienteId;
+            });
+            const jsonInput = document.getElementById('clientePorAsientoJson');
+            if (jsonInput) jsonInput.value = JSON.stringify(relaciones);
+        });
+    }
+
+    // Abre modal para crear nuevo cliente (este modal ya está en el fragment modalNuevoCliente)
+    function abrirModalNuevoCliente(asientoId) {
+        document.getElementById('modalAsientoId').value = asientoId;
+
+        // Limpiar campos
+        document.getElementById('inputNuevoCliente').value = '';
+        document.getElementById('inputCedula').value = '';
+        document.getElementById('generoM').checked = true;
+
+        const modal = new bootstrap.Modal(document.getElementById('modalNuevoCliente'));
+        modal.show();
+    }
+
+    // Al cargar página: controlar envío formulario nuevo cliente
+    document.addEventListener('DOMContentLoaded', () => {
+        const formNuevoCliente = document.getElementById('formNuevoCliente');
+        formNuevoCliente?.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const nombre = document.getElementById('inputNuevoCliente').value.trim();
+            const cedula = document.getElementById('inputCedula').value.trim();
+            const genero = document.querySelector('input[name="genero"]:checked')?.value;
+            const asientoId = document.getElementById('modalAsientoId').value;
+
+            if (!nombre || !cedula || !genero) {
+                alert("Todos los campos son obligatorios.");
+                return;
+            }
+
+            const nuevoCliente = {
+                clienteReferenteId: 1,  // Cambia si lo quieres dinámico
+                clienteNombre: nombre,
+                clienteCedula: cedula,
+                clienteGenero: genero,
+                clienteContrasena: cedula,
+                clienteUsuario: cedula,
+                clienteRol: "cliente"
+            };
+
+            fetch('/clientes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(nuevoCliente)
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error("Error al guardar cliente");
+                    return res.json();
+                })
+                .then(cliente => {
+                    // Añadir cliente creado al select del asiento correspondiente
+                    const sel = document.getElementById('select-cliente-' + asientoId);
+                    if (sel) {
+                        const opt = document.createElement('option');
+                        opt.value = cliente.clienteId;
+                        opt.textContent = cliente.clienteNombre + (cliente.clienteApellido ? ' ' + cliente.clienteApellido : '');
+                        sel.appendChild(opt);
+                        sel.value = cliente.clienteId;
+                    }
+
+                    // Cerrar modal nuevo cliente
+                    bootstrap.Modal.getInstance(document.getElementById('modalNuevoCliente')).hide();
+                    alert("Cliente creado y seleccionado.");
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Ocurrió un error al guardar el cliente.");
+                });
+        });
+    });
+
+    // Funciones para ver ruta vuelo, filtro, etc. (tu código actual)
 
     function verRutaVuelo(idVuelo) {
         fetch('/rutaVuelo/' + idVuelo)
             .then(res => res.text())
             .then(html => {
                 document.getElementById('modalContainer').innerHTML = html;
-
-                const modalElement = document.getElementById('modalRuta');
-                const modal = new bootstrap.Modal(modalElement);
+                const modal = new bootstrap.Modal(document.getElementById('modalRuta'));
                 modal.show();
 
-                modalElement.addEventListener('shown.bs.modal', () => {
+                document.getElementById('modalRuta').addEventListener('shown.bs.modal', () => {
                     const datos = document.getElementById('datosRuta');
                     const origen = [parseFloat(datos.dataset.latOrigen), parseFloat(datos.dataset.lonOrigen)];
                     const destino = [parseFloat(datos.dataset.latDestino), parseFloat(datos.dataset.lonDestino)];
 
-                    // 🗺️ Crear mapa
-                    if (map) map.remove(); // destruir mapa anterior
+                    if (map) map.remove();
                     map = L.map('map').setView(origen, 5);
-
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; OpenStreetMap contributors'
-                    }).addTo(map);
-
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
                     L.marker(origen).addTo(map).bindPopup("Origen").openPopup();
                     L.marker(destino).addTo(map).bindPopup("Destino");
                     L.polyline([origen, destino], { color: 'red' }).addTo(map);
 
-                    // Calcular distancia
                     const dist = calcularDistancia(origen, destino);
                     document.getElementById("distance").innerText = `Distancia aproximada: ${dist} km`;
-
-                    // Ajustar tamaño del mapa
                     setTimeout(() => map.invalidateSize(), 300);
                 }, { once: true });
             });
@@ -237,15 +294,29 @@
         const dLon = toRad(coord2[1] - coord1[1]);
         const lat1 = toRad(coord1[0]);
         const lat2 = toRad(coord2[0]);
-
         const a = Math.sin(dLat / 2) ** 2 +
             Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return (R * c).toFixed(2);
+        return (R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)))).toFixed(2);
     }
+
+    function filtrar() {
+        let origen = document.getElementById("filtroOrigen").value.toLowerCase();
+        let destino = document.getElementById("filtroDestino").value.toLowerCase();
+        let fecha = document.getElementById("filtroFecha").value;
+        let filas = document.querySelectorAll("#tablaVuelos tbody tr");
+
+        filas.forEach(fila => {
+            let td = fila.querySelectorAll("td");
+            let textoOrigen = td[0]?.innerText.toLowerCase() || "";
+            let textoDestino = td[1]?.innerText.toLowerCase() || "";
+            let textoFecha = td[2]?.innerText.slice(0, 10) || "";
+            let coincideOrigen = textoOrigen.includes(origen);
+            let coincideDestino = textoDestino.includes(destino);
+            let coincideFecha = !fecha || textoFecha === fecha;
+            fila.style.display = (coincideOrigen && coincideDestino && coincideFecha) ? "" : "none";
+        });
+    }
+
 </script>
-
-
-
 </body>
 </html>

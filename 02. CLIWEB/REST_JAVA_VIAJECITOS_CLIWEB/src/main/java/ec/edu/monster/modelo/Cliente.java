@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class Cliente {
     private Integer clienteId;
+    private Integer clienteReferenteId;
     private String clienteNombre;
     private String clienteEmail;
     private String clienteTelefono;
