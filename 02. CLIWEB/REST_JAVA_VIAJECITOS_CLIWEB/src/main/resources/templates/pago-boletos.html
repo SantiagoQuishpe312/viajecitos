@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Carrito de Boletos Pendientes</title>
+    <!-- Fuente y FontAwesome para íconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #f5f7fa;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        h2 {
+            margin: 30px 0 20px;
+            color: #2c3e50;
+        }
+        table {
+            border-collapse: collapse;
+            width: 90%;
+            max-width: 900px;
+            background: white;
+            box-shadow: 0 0 12px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            text-align: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #2980b9;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        tr:hover {
+            background-color: #f1f9ff;
+        }
+        .trash-icon {
+            cursor: pointer;
+            color: #e74c3c;
+            font-size: 1.2em;
+            transition: color 0.3s ease;
+        }
+        .trash-icon:hover {
+            color: #c0392b;
+        }
+        .no-boletos {
+            margin-top: 40px;
+            font-size: 1.1em;
+            color: #777;
+        }
+        .btn-volver {
+            margin: 25px 0 50px;
+            text-decoration: none;
+            background-color: #2980b9;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .btn-volver:hover {
+            background-color: #1c5980;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Boletos Pendientes de Pago</h2>
+
+<div th:if="${#lists.isEmpty(boletos)}" class="no-boletos">
+    <p>No tienes boletos pendientes.</p>
+</div>
+
+<table th:if="${!#lists.isEmpty(boletos)}">
+    <thead>
+    <tr>
+        <th>Eliminar</th>
+        <th>ID</th>
+        <th>Origen</th>
+        <th>Destino</th>
+        <th>Fecha</th>
+        <th>Cantidad</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="boleto : ${boletos}">
+        <td>
+            <a th:href="@{'/boletos/eliminar/' + ${boleto.boleto.boletoId}}"
+               onclick="return confirm('¿Seguro que quieres eliminar este boleto?')"
+               class="trash-icon" title="Eliminar boleto">
+                <i class="fas fa-trash-alt"></i>
+            </a>
+        </td>
+        <td th:text="${boleto.boleto.boletoId}">1</td>
+        <td th:text="${boleto.cuidadOrigen.ciudadNombre}">Quito</td>
+        <td th:text="${boleto.ciudadDestino.ciudadNombre}">Guayaquil</td>
+        <td th:text="${#temporals.format(boleto.vuelo.vueloFechaSalida, 'dd/MM/yyyy HH:mm')}">28/06/2025 15:00</td>
+        <td th:text="${boleto.boleto.boletoCantidad}">2</td>
+    </tr>
+    </tbody>
+</table>
+
+<a href="/vuelos" class="btn-volver">← Volver a la lista de vuelos</a>
+
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Boletos por Asiento</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+
+        .boleto {
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            page-break-after: always;
+        }
+
+        .detalle, .qr, .vuelo, .ruta {
+            margin-top: 20px;
+        }
+
+        .detalle p, .ruta p, .vuelo p {
+            margin: 8px 0;
+        }
+
+        .qr {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        button {
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1em;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button:hover {
+            background-color: #0b5ed7;
+        }
+
+        @media print {
+            button {
+                display: none;
+            }
+
+            body {
+                background-color: white;
+                margin: 0;
+            }
+
+            .boleto {
+                box-shadow: none;
+                border: none;
+                margin: 0;
+                page-break-after: always;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .boleto {
+                padding: 15px;
+                margin: 15px 0;
+            }
+
+            h1 {
+                font-size: 1.4em;
+            }
+
+            h2 {
+                font-size: 1.1em;
+            }
+
+            canvas {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body onload="window.print()">
+
+<div th:each="asiento : ${boleto.asientos}" class="boleto">
+    <h1>Boleto de Vuelo</h1>
+
+    <div class="detalle">
+        <p><strong>ID Boleto:</strong> <span th:text="${boleto.boleto.boletoId}"></span></p>
+        <p><strong>Estado:</strong> <span th:text="${boleto.boleto.boletoEstado}"></span></p>
+        <p><strong>Fecha de Compra:</strong> <span th:text="${#temporals.format(boleto.boleto.boletoFechaCompra, 'dd/MM/yyyy HH:mm')}"></span></p>
+        <p><strong>Asiento:</strong> Fila <span th:text="${asiento.fila}"></span>, Columna <span th:text="${asiento.columna}"></span> (<span th:text="${asiento.tipo}"></span>)</p>
+    </div>
+
+    <div class="ruta">
+        <h2>Ruta</h2>
+        <p>
+            <strong>Origen:</strong> <span th:text="${boleto.cuidadOrigen.ciudadNombre}"></span> (<span th:text="${boleto.cuidadOrigen.ciudadCodigo}"></span>)<br>
+            <strong>Destino:</strong> <span th:text="${boleto.ciudadDestino.ciudadNombre}"></span> (<span th:text="${boleto.ciudadDestino.ciudadCodigo}"></span>)
+        </p>
+    </div>
+
+    <div class="vuelo">
+        <h2>Vuelo</h2>
+        <p>
+            <strong>ID Vuelo:</strong> <span th:text="${boleto.vuelo.vueloId}"></span><br>
+            <strong>Fecha de Salida:</strong> <span th:text="${#temporals.format(boleto.vuelo.vueloFechaSalida, 'dd/MM/yyyy HH:mm')}"></span><br>
+            <strong>Valor:</strong> $<span th:text="${#numbers.formatDecimal(boleto.vuelo.vueloValor, 1, 'COMMA', 2, 'POINT')}"></span>
+        </p>
+    </div>
+
+    <div class="qr" th:with="qrTexto='Boleto ID: ' + ${boleto.boleto.boletoId} + ' Asiento: Fila ' + ${asiento.fila} + ' Columna ' + ${asiento.columna}">
+        <canvas th:attr="data-qr-text=${qrTexto}"></canvas>
+    </div>
+</div>
+
+<button onclick="window.print()">Imprimir</button>
+
+<!-- QR Code Script -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("canvas[data-qr-text]").forEach(canvas => {
+            const text = canvas.getAttribute("data-qr-text");
+            QRCode.toCanvas(canvas, text, { width: 200 }, function (error) {
+                if (error) console.error(error);
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

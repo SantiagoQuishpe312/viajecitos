@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Carrito de Boletos Pendientes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" th:href="@{/css/estilos-navbar.css}" />
+
+    <style>
+        body {
+    font-family: 'Roboto', sans-serif;
+    background: #f5f7fa;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    color: #333;
+    font-size: 18px;
+}
+
+h2 {
+    color: #2c3e50;
+    font-size: 28px;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.tabla-responsive {
+    width: 100%;
+    overflow-x: auto;
+    padding: 0 15px;
+    margin-bottom: 30px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 1000px;
+    background: white;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 16px;
+    margin: auto;
+}
+
+th, td {
+    text-align: center;
+    padding: 14px 18px;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #2980b9;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 15px;
+}
+
+tr:hover {
+    background-color: #f1f9ff;
+}
+
+tfoot td {
+    font-weight: bold;
+    background-color: #ecf0f1;
+}
+
+.no-boletos {
+    margin-top: 40px;
+    font-size: 1.2em;
+    color: #777;
+    text-align: center;
+}
+
+.btn-volver {
+    margin: 25px 0 40px;
+    text-decoration: none;
+    background-color: #2980b9;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    display: block;
+    text-align: center;
+}
+
+.btn-volver:hover {
+    background-color: #1c5980;
+}
+
+form#formMetodoPago {
+    width: 90%;
+    max-width: 500px;
+    margin-bottom: 40px;
+    padding: 15px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    background: #fff;
+    border-radius: 8px;
+}
+
+label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+select,
+input[type="text"],
+input[type="month"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+button {
+    font-size: 16px;
+}
+
+.tarjeta-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 10px;
+    width: 100%;
+    max-width: 500px;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+.tarjeta-card {
+    background: linear-gradient(135deg, #34495e, #2c3e50);
+    color: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.tarjeta-card:hover {
+    transform: scale(1.02);
+}
+
+.tarjeta-card .chip {
+    width: 40px;
+    height: 30px;
+    background: gold;
+    border-radius: 5px;
+}
+
+.tarjeta-card .marca {
+    font-weight: bold;
+    font-size: 1.3em;
+}
+
+.tarjeta-card .numero {
+    font-family: monospace;
+    font-size: 1.2em;
+}
+
+.tarjeta-card .fecha {
+    font-size: 1em;
+    color: #ccc;
+}
+
+.tarjeta-lista input[type="radio"] {
+    display: none;
+}
+
+.tarjeta-lista input[type="radio"]:checked + .tarjeta-card {
+    border: 2px solid #27ae60;
+    box-shadow: 0 0 12px #27ae60;
+}
+
+.logo-tarjeta {
+    height: 28px;
+    object-fit: contain;
+}
+
+#opcionesTarjeta {
+    padding: 0 15px;
+    max-width: 500px;
+    margin: auto;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    body {
+        font-size: 16px;
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    .btn-volver {
+        width: 100%;
+        padding: 12px;
+    }
+
+    .tarjeta-card .marca,
+    .tarjeta-card .numero,
+    .tarjeta-card .fecha {
+        font-size: 1em;
+    }
+
+    .tarjeta-card .chip {
+        width: 30px;
+        height: 20px;
+    }
+}
+
+    </style>
+</head>
+<body>
+<h2>Boletos Pendientes de Pago</h2>
+
+<div th:if="${#lists.isEmpty(boletos)}" class="no-boletos">
+    <p>No tienes boletos pendientes.</p>
+</div>
+
+<div class="tabla-responsive">
+    <table th:if="${!#lists.isEmpty(boletos)}">
+    <thead>
+    <tr>
+        <th>Eliminar</th>
+        <th>ID</th>
+        <th>Origen</th>
+        <th>Destino</th>
+        <th>Fecha</th>
+        <th>Cantidad</th>
+        <th>Precio Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="boleto : ${boletos}">
+        <td>
+            <a th:href="@{'/boletos/eliminar/' + ${boleto.boleto.boletoId}}"
+               onclick="return confirm('¿Seguro que quieres eliminar este boleto?')"
+               class="trash-icon" title="Eliminar boleto">
+                <i class="fas fa-trash-alt"></i>Eliminar
+            </a>
+        </td>
+        <td th:text="${boleto.boleto.boletoId}">1</td>
+        <td th:text="${boleto.cuidadOrigen.ciudadNombre}">Quito</td>
+        <td th:text="${boleto.ciudadDestino.ciudadNombre}">Guayaquil</td>
+        <td th:text="${#temporals.format(boleto.vuelo.vueloFechaSalida, 'dd/MM/yyyy HH:mm')}">28/06/2025 15:00</td>
+        <td th:text="${boleto.boleto.boletoCantidad}">2</td>
+        <td th:text="${boleto.vuelo.vueloValor.multiply(new java.math.BigDecimal(boleto.boleto.boletoCantidad))}">20.00</td>
+    </tr>
+    </tbody>
+    <tfoot>
+    <tr>
+        <td colspan="6" style="text-align: right;">Subtotal:</td>
+        <td th:text="${totalPrecio}">0.00</td>
+    </tr>
+    <tr>
+        <td colspan="6" style="text-align: right;">Iva</td>
+        <td th:text="${totalPrecio*0.15}">0.00</td>
+    </tr>
+    <tr>
+        <td colspan="6" style="text-align: right;">Total</td>
+        <td th:text="${totalPrecio*1.15}">0.00</td>
+    </tr>
+    </tfoot>
+    </table>
+</div>
+
+<div id="infoCredito" style="margin-top: 20px; display: none;">
+    <p><strong>Crédito disponible:</strong> $<span id="creditoDisponibleTexto">0.00</span></p>
+    <p><strong>Total a pagar:</strong> $<span id="totalPagoTexto">0.00</span></p>
+</div>
+
+<div id="errorCredito" style="display: none; color: red; margin-top: 10px;">
+    No tienes crédito suficiente para pagar este monto.
+</div>
+<div id="noSujetoCredito" style="display: none; color: red; margin-top: 10px;">
+    No estás habilitado para pagar con crédito directo.
+</div>
+<a href="/vuelos" class="btn-volver">← Volver a la lista de vuelos</a>
+<form id="formMetodoPago" th:action="@{/carrito/pagar}" method="post"
+      style="margin: 30px auto; max-width: 400px; width: 90%;">
+    <label for="metodoPago" style="font-weight: 600; display: block; margin-bottom: 8px;">
+        Seleccione método de pago:
+    </label>
+    <select id="metodoPago" name="metodoPago" required
+            style="width: 100%; padding: 8px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #ccc;">
+        <option value="" disabled selected>-- Elija un método --</option>
+        <option value="tarjeta">Tarjeta de crédito/débito</option>
+        <option value="credito">Crédito directo</option>
+        <option value="paypal">Efectivo</option>
+    </select>
+
+    <!-- Campo de cuotas: solo visible si se selecciona "credito" -->
+    <div id="opcionesCredito" style="display: none;">
+        <label for="numCuotas" style="font-weight: 600; display: block; margin-bottom: 8px;">
+            Número de cuotas:
+        </label>
+        <select id="numCuotas" name="numCuotas"
+                style="width: 100%; padding: 8px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #ccc;">
+            <option value="3">3 cuotas</option>
+            <option value="6">6 cuotas</option>
+            <option value="9">9 cuotas</option>
+            <option value="12" selected>12 cuotas</option>
+        </select>
+
+        <label for="tipoAmortizacion" style="font-weight: 600; display: block; margin-bottom: 8px;">
+            Tipo de amortización:
+        </label>
+        <select id="tipoAmortizacion" name="tipoAmortizacion"
+                style="width: 100%; padding: 8px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #ccc;">
+            <option value="frances" selected>Francesa</option>
+            <option value="alemana">Alemana</option>
+        </select>
+
+        <!-- Cambiar tipo a button y quitar submit -->
+        <button type="button" class="btn-volver"
+                id="btnVerAmortizacion"
+                style="width: 100%; background-color: #27ae60; margin-bottom: 10px;">
+            Ver Amortización
+        </button>
+
+    </div>
+
+    <!-- Botón normal de pago -->
+    <button type="submit" class="btn-volver" name="accion" value="pagar"
+            style="width: 100%;" id="btnPagar">
+        Pagar
+    </button>
+
+
+</form>
+<!-- Mostrar tarjetas del cliente si elige 'tarjeta' -->
+<div id="opcionesTarjeta" style="display: none;">
+
+    <div class="tarjeta-lista" th:each="tarjeta : ${tarjetas}">
+        <input type="radio" name="tarjetaId" th:id="'tarjeta-' + ${tarjeta.tarjetaId}" th:value="${tarjeta.tarjetaId}" required />
+        <label th:for="'tarjeta-' + ${tarjeta.tarjetaId}" class="tarjeta-card">
+            <div class="chip"></div>
+            <div class="marca" th:text="${tarjeta.tarjetaTipo}">VISA</div>
+            <div class="numero" th:text="'**** **** **** ' + ${#strings.substring(tarjeta.tarjetaNumero, tarjeta.tarjetaNumero.length() - 4)}">**** **** **** 1234</div>
+            <div class="fecha" th:text="'Exp: ' + ${#dates.format(tarjeta.tarjetaFechaCad, 'MM/yy')}">Exp: 12/25</div>
+            <div class="marca">
+                <img th:if="${tarjeta.tarjetaTipo == 'VISA'}" src="/static/img/visa.svg" alt="Visa" class="logo-tarjeta"/>
+                <img th:if="${tarjeta.tarjetaTipo == 'MASTERCARD'}" src="/static/img/mastercard.svg" alt="MasterCard" class="logo-tarjeta"/>
+                <img th:if="${tarjeta.tarjetaTipo == 'AMEX'}" src="/static/img/amex.svg" alt="American Express" class="logo-tarjeta"/>
+                <span th:unless="${tarjeta.tarjetaTipo == 'VISA' or tarjeta.tarjetaTipo == 'MASTERCARD' or tarjeta.tarjetaTipo == 'AMEX'}"
+                      th:text="${tarjeta.tarjetaTipo}">Tarjeta</span>
+            </div>
+
+        </label>
+    </div>
+    <!-- Botón para abrir modal -->
+    <button id="abrirModalTarjeta" style="margin: 15px;">Agregar Nueva Tarjeta</button>
+
+    <!-- Modal -->
+    <div id="modalTarjeta" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+        <div style="background:#fff; padding: 20px; border-radius: 8px; width: 400px; max-width: 90%;">
+            <h3>Agregar Nueva Tarjeta</h3>
+            <form th:action="@{/tarjetas/crear}" th:object="${nuevaTarjeta}" method="post" id="formNuevaTarjeta">
+
+                <label>Número de Tarjeta:</label>
+                <input type="text" th:field="*{tarjetaNumero}" pattern="\d{16}" required maxlength="16"/>
+
+                <label>CVV:</label>
+                <input type="text" th:field="*{tarjetaCvv}" pattern="\d{3,4}" required maxlength="4"/>
+
+                <label>Fecha de Caducidad:</label>
+                <input type="month" id="tarjetaFechaCadInput" required />
+
+                <!-- Este hidden es el que se envía realmente al backend -->
+                <input type="hidden" th:field="*{tarjetaFechaCad}" id="tarjetaFechaCadHidden" />
+
+
+
+                <br/><br/>
+                <button type="submit">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+
+
+</div>
+
+<script>
+    document.getElementById('metodoPago').addEventListener('change', function () {
+        const metodo = this.value;
+        const opcionesCredito = document.getElementById('opcionesCredito');
+        const opcionesTarjeta = document.getElementById('opcionesTarjeta');
+
+        if (metodo === 'credito') {
+            opcionesCredito.style.display = 'block';
+            opcionesTarjeta.style.display = 'none';
+        } else if (metodo === 'tarjeta') {
+            opcionesCredito.style.display = 'none';
+            opcionesTarjeta.style.display = 'block';
+        } else {
+            opcionesCredito.style.display = 'none';
+            opcionesTarjeta.style.display = 'none';
+        }
+    });
+</script>
+
+<!-- Mostrar tabla de amortización si existe -->
+<div id="contenedorTablaAmortizacion" style="display: none;">
+    <h2>Tabla de Amortización (Crédito directo)</h2>
+    <table id="tablaAmortizacion">
+        <thead>
+        <tr>
+            <th>Cuota</th>
+            <th>Valor Cuota</th>
+            <th>Interés</th>
+            <th>Capital</th>
+            <th>Saldo</th>
+        </tr>
+        </thead>
+        <tbody id="tablaAmortizacionBody">
+        <!-- Se llenará con JavaScript -->
+        </tbody>
+    </table>
+    <button id="btnDescargarExcel" style="margin-bottom: 20px;">Descargar tabla de amortización (Excel)</button>
+    <button id="btnDescargarPdf" style="margin-bottom: 20px;">Descargar tabla de amortización (PDF)</button>
+</div>
+
+<script th:inline="none" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script th:inline="none" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script th:inline="none">
+    document.getElementById('btnDescargarPdf').addEventListener('click', () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const headers = [["Cuota", "Valor Cuota", "Interés", "Capital", "Saldo"]];
+        const data = [];
+
+        document.querySelectorAll('#tablaAmortizacion tbody tr').forEach(tr => {
+            const row = [];
+            tr.querySelectorAll('td').forEach(td => row.push(td.innerText));
+            data.push(row);
+        });
+
+        doc.text("Tabla de Amortización", 14, 15);
+        doc.autoTable({
+            head: headers,
+            body: data,
+            startY: 20,
+        });
+
+        doc.save('tabla_amortizacion.pdf');
+    });
+</script>
+
+<script th:inline="none" src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+<script th:inline="javascript">
+    // Thymeleaf inyecta estas variables aquí, sin comillas ni nada más
+    const totalPago = /*[[${totalMasIva != null ? totalMasIva : 0}]]*/ 0;
+    const clienteId = /*[[${clienteId != null ? clienteId : 0}]]*/ 0;
+</script>
+
+<script>
+    const metodoPago = document.getElementById("metodoPago");
+    const btnPagar = document.getElementById("btnPagar");
+
+    function mostrarInfoCredito(credito, total) {
+        const divInfo = document.getElementById("infoCredito");
+        const spanCredito = document.getElementById("creditoDisponibleTexto");
+        const spanTotal = document.getElementById("totalPagoTexto");
+
+        spanCredito.textContent = credito.toFixed(2);
+        spanTotal.textContent = total.toFixed(2);
+        divInfo.style.display = "block";
+    }
+
+    function ocultarInfoCredito() {
+        const divInfo = document.getElementById("infoCredito");
+        divInfo.style.display = "none";
+    }
+
+    function mostrarErrorCredito(mostrar) {
+        document.getElementById("errorCredito").style.display = mostrar ? "block" : "none";
+    }
+
+    function mostrarNoSujetoCredito(mostrar) {
+        document.getElementById("noSujetoCredito").style.display = mostrar ? "block" : "none";
+    }
+
+    function validarPago() {
+        const metodo = metodoPago.value;
+
+        if (!metodo) {
+            // No se ha seleccionado método de pago
+            btnPagar.disabled = true;
+            mostrarErrorCredito(false);
+            mostrarNoSujetoCredito(false);
+            ocultarInfoCredito();
+            return;
+        }
+
+        if (metodo === "tarjeta") {
+            // Se debe seleccionar una tarjeta
+            const tarjetaSeleccionada = document.querySelector('input[name="tarjetaId"]:checked');
+            btnPagar.disabled = !tarjetaSeleccionada;
+            mostrarErrorCredito(false);
+            mostrarNoSujetoCredito(false);
+            ocultarInfoCredito();
+
+        } else if (metodo === "credito") {
+            fetch(`/credito/evaluar/${clienteId}`)
+                .then(response => {
+                    if (!response.ok) throw new Error("Error consultando crédito");
+                    return response.json();
+                })
+                .then(data => {
+                    const credito = parseFloat(data.creditoDisponible);
+                    mostrarInfoCredito(credito, totalPago);
+
+                    if (!data.sujetoCredito) {
+                        btnPagar.disabled = true;
+                        mostrarErrorCredito(false);
+                        mostrarNoSujetoCredito(true);
+                    } else if (credito >= totalPago) {
+                        btnPagar.disabled = false;
+                        mostrarErrorCredito(false);
+                        mostrarNoSujetoCredito(false);
+                    } else {
+                        btnPagar.disabled = true;
+                        mostrarErrorCredito(true);
+                        mostrarNoSujetoCredito(false);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al validar crédito:", error);
+                    btnPagar.disabled = true;
+                    mostrarErrorCredito(true);
+                    mostrarNoSujetoCredito(false);
+                    ocultarInfoCredito();
+                });
+        } else {
+            // Otros métodos (e.g. efectivo/paypal)
+            btnPagar.disabled = false;
+            mostrarErrorCredito(false);
+            mostrarNoSujetoCredito(false);
+            ocultarInfoCredito();
+        }
+    }
+
+    // Añadimos listener para que validarPago se llame en estos eventos:
+
+    // Cuando cambie el método de pago (incluyendo la opción vacía)
+    metodoPago.addEventListener('change', () => {
+        const metodo = metodoPago.value;
+        const opcionesCredito = document.getElementById('opcionesCredito');
+        const opcionesTarjeta = document.getElementById('opcionesTarjeta');
+
+        if (metodo === 'credito') {
+            opcionesCredito.style.display = 'block';
+            opcionesTarjeta.style.display = 'none';
+        } else if (metodo === 'tarjeta') {
+            opcionesCredito.style.display = 'none';
+            opcionesTarjeta.style.display = 'block';
+            agregarListenersTarjetas(); // ← Aquí agregamos los listeners cada vez que cambia a "tarjeta"
+        } else {
+            opcionesCredito.style.display = 'none';
+            opcionesTarjeta.style.display = 'none';
+        }
+
+        btnPagar.disabled = true;
+        validarPago();
+    });
+
+
+    // También validar cuando se seleccionan tarjetas (para el método tarjeta)
+    document.querySelectorAll('input[name="tarjetaId"]').forEach(radio => {
+        radio.addEventListener('change', validarPago);
+    });
+
+    // Inicializar estado al cargar la página
+    document.addEventListener("DOMContentLoaded", () => {
+        btnPagar.disabled = true;
+        document.getElementById('contenedorTablaAmortizacion').style.display = "none";
+    });
+
+    document.getElementById('btnVerAmortizacion').addEventListener('click', function () {
+        const numCuotas = document.getElementById('numCuotas').value;
+        const tipoAmortizacion = document.getElementById('tipoAmortizacion').value;
+
+        fetch(`/carrito/amortizacion?clienteId=${clienteId}&numCuotas=${numCuotas}&tipoAmortizacion=${tipoAmortizacion}`)
+            .then(response => {
+                if (!response.ok) throw new Error('No se pudo calcular la amortización');
+                return response.json();
+            })
+            .then(cuotas => {
+                const tbody = document.getElementById("tablaAmortizacionBody");
+                tbody.innerHTML = "";
+
+                cuotas.forEach(cuota => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${cuota.numeroCuota}</td>
+                        <td>${cuota.valorCuota.toFixed(2)}</td>
+                        <td>${cuota.interesPagado.toFixed(2)}</td>
+                        <td>${cuota.capitalPagado.toFixed(2)}</td>
+                        <td>${cuota.saldoPendiente.toFixed(2)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById('contenedorTablaAmortizacion').style.display = "block";
+
+                validarPago();
+            })
+            .catch(error => {
+                alert("Error al calcular la amortización: " + error.message);
+                console.error(error);
+            });
+    });
+    function agregarListenersTarjetas() {
+        document.querySelectorAll('input[name="tarjetaId"]').forEach(radio => {
+            radio.addEventListener('change', validarPago);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        btnPagar.disabled = true;
+        document.getElementById('contenedorTablaAmortizacion').style.display = "none";
+        agregarListenersTarjetas(); // ← Esto asegura que si ya hay tarjetas, se escuchen sus cambios
+    });
+
+</script>
+
+
+</body>
+</html>

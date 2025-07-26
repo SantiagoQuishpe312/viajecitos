@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Cliente Web</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+                        url('https://www.infobae.com/resizer/v2/BCWNAG4MNRBSLHAM7COBNDWIJM.jpg?auth=4845436f90b1b02cbeabbf006bc9ecaec9ed461e4f44709a1949d39e4f2dde4f&smart=true&width=768&height=432&quality=85') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 360px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 15px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            max-width: 100%;
+            padding: 10px 12px;
+            margin-top: 5px;
+            border: 1.8px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #4a90e2;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4a90e2;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: #357ABD;
+        }
+
+        p.error-message {
+            color: #e74c3c;
+            margin-top: 15px;
+            font-weight: 600;
+            text-align: center;
+            background-color: #fceae9;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #e74c3c;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 25px 20px;
+                border-radius: 8px;
+            }
+
+            h2 {
+                font-size: 1.4rem;
+            }
+
+            button {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h2>Iniciar Sesión</h2>
+    <form th:action="@{/login}" th:object="${loginRequest}" method="post">
+        <label>
+            Usuario:
+            <input type="text" th:field="*{usuario}" required autofocus />
+        </label>
+        <label>
+            Contraseña:
+            <input type="password" th:field="*{contrasena}" required />
+        </label>
+        <button type="submit">Entrar</button>
+    </form>
+
+    <p th:if="${error}" th:text="${error}" class="error-message"></p>
+</div>
+</body>
+</html>

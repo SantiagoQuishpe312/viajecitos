@@ -1,0 +1,339 @@
+<div th:fragment="modalAsientos">
+    <div class="modal fade" id="modalAsientos" tabindex="-1"
+         aria-labelledby="modalAsientosLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAsientosLabel">
+                        Seleccionar Asientos (Vuelo [[${vueloId}]])
+                    </h5>
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- ✅ Contador flotante -->
+                    <div id="contadorFlotante">
+                        Seleccionados: <span id="contadorSeleccion">0</span>
+                        <button type="button" class="btn btn-sm btn-light ms-2" onclick="limpiarSeleccion()">Limpiar</button>
+                    </div>
+
+                    <form method="post" th:action="@{/seleccionar-asientos}" id="formAsientos">
+                        <input type="hidden" name="vueloId" th:value="${vueloId}" />
+
+                        <div class="bus mt-4">
+                            <div th:each="fila : ${rows}" class="fila" style="margin-bottom: 8px;">
+                                <div th:each="col : ${cols}" style="display: inline-block; margin-right:4px;"
+                                     th:with="asiento=${asientoMap[fila.toString()][col.toString()]}">
+
+                                    <input type="checkbox"
+                                           th:id="${'asi-' + fila + '-' + col}"
+                                           name="asientos"
+                                           th:value="${asiento != null ? asiento.asientoId : ''}"
+                                           th:data-asiento-id="${asiento != null ? asiento.asientoId : ''}"
+                                           th:disabled="${asiento == null or asiento.estado != 'DISPONIBLE'}"
+                                    />
+
+
+
+                                    <label th:for="${'asi-' + fila + '-' + col}"
+                                           class="asiento"
+                                           th:classappend="(
+               ${asiento != null and asiento.estado=='DISPONIBLE'} ? ' disponible' :
+               (${asiento != null and asiento.estado=='RESERVADO'} ? ' reservado' :
+               (${asiento != null and asiento.estado=='PAGADO'} ? ' pagado' : ''))
+           )">
+                                        <span th:text="${fila + col}">A1</span>
+                                    </label>
+                                    <!-- Contenedor para el selector de cliente (inicialmente oculto) -->
+                                    <div class="form-cliente mt-1" style="display: none;"
+                                         th:id="'form-cliente-' + ${asiento.asientoId}">
+                                        <select class="form-select form-select-sm seleccionar-cliente"
+                                                th:id="'select-cliente-' + ${asiento.asientoId}"
+                                                th:data-asiento-id="${asiento.asientoId}">
+                                            <option value="">Seleccionar cliente</option>
+                                            <option th:each="c : ${clientesReferidos}"
+                                                    th:value="${c.clienteId}"
+                                                    th:text="${c.clienteNombre + ' ' + c.clienteApellido}">
+                                            </option>
+                                        </select>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-success mt-1 agregar-cliente"
+                                                th:data-asiento-id="${asiento.asientoId}">
+                                            + Crear nuevo cliente
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <span th:if="${col=='C'}" style="display:inline-block;width:20px;"></span>
+                            </div>
+                        </div>
+
+
+                        <div class="modal-footer">
+                            <button type="submit" name="accion" value="seguir" class="btn btn-success">Seguir comprando</button>
+                            <button type="submit" name="accion" value="pagar" class="btn btn-primary">Ir a pagar</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function abrirModal(vueloId) {
+        fetch('/asientos/vuelo/' + vueloId)
+            .then(r => r.text())
+            .then(html => {
+                const cont = document.getElementById('modalContainer');
+                cont.innerHTML = html + `
+                <div id="loadingOverlay" style="
+                  display:none; position:absolute; inset:0;
+                  background: rgba(255,255,255,0.8);
+                  justify-content: center; align-items: center;
+                  z-index:99999;">
+                    Procesando...
+                </div>`;
+
+                // 🧠 Esperamos un pequeño tiempo para asegurar que el DOM se cargue
+                setTimeout(() => {
+                    const checkboxes = document.querySelectorAll('input[type="checkbox"][name="asientos"]');
+                    const contador = document.getElementById('contadorSeleccion');
+
+                    function actualizarContador() {
+                        const seleccionados = Array.from(checkboxes).filter(cb => cb.checked);
+                        contador.textContent = seleccionados.length;
+                    }
+
+                    checkboxes.forEach(cb => {
+                        const label = document.querySelector('label[for="' + cb.id + '"]');
+                        const asientoId = cb.getAttribute('data-asiento-id');
+                        const formCliente = document.getElementById('form-cliente-' + asientoId);
+
+                        cb.addEventListener('change', function () {
+                            if (cb.checked) {
+                                label.classList.add('seleccionado');
+                                if (formCliente) formCliente.style.display = 'block';
+                            } else {
+                                label.classList.remove('seleccionado');
+                                if (formCliente) {
+                                    formCliente.style.display = 'none';
+                                    const select = formCliente.querySelector('select');
+                                    if (select) select.value = "";
+                                }
+                            }
+                            actualizarContador();
+                        });
+                    });
+
+                    actualizarContador();
+                    // Abrir el modal de Bootstrap
+                    const modal = new bootstrap.Modal(document.getElementById('modalAsientos'));
+                    modal.show();
+
+                }, 200); // Le damos un poco más de tiempo para asegurar carga completa
+            });
+    }
+
+
+    // Crear nuevo cliente desde botón + Crear nuevo cliente
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('agregar-cliente')) {
+            const asientoId = e.target.getAttribute('data-asiento-id');
+            const nombre = prompt("Ingrese nombre del nuevo cliente:");
+            const apellido = prompt("Ingrese apellido del nuevo cliente:");
+
+            if (nombre && apellido) {
+                fetch('/clientes', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        clienteNombre: nombre,
+                        clienteApellido: apellido
+                    })
+                })
+                    .then(r => r.json())
+                    .then(cliente => {
+                        const select = document.getElementById('select-cliente-' + asientoId);
+                        const opt = new Option(cliente.clienteNombre + " " + cliente.clienteApellido, cliente.clienteId, true, true);
+                        select.appendChild(opt);
+                        select.value = cliente.clienteId;
+                    })
+                    .catch(() => alert("Error al crear cliente"));
+            }
+        }
+    });
+
+    function limpiarSeleccion() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"][name="asientos"]');
+        const contador = document.getElementById('contadorSeleccion');
+        checkboxes.forEach(cb => {
+            cb.checked = false;
+            const label = document.querySelector('label[for="' + cb.id + '"]');
+            if (label) label.classList.remove('seleccionado');
+            const asientoId = cb.value;
+            const formCliente = document.getElementById('form-cliente-' + asientoId);
+            if (formCliente) {
+                formCliente.style.display = 'none';
+                formCliente.querySelector('select').value = "";
+            }
+        });
+        contador.textContent = 0;
+    }
+
+    function cerrarModal() {
+        document.getElementById('modalContainer').innerHTML = '';
+    }
+
+    // Manejo del submit
+    document.addEventListener('submit', evt => {
+        if (evt.target.id === 'formAsientos') {
+            evt.preventDefault();
+
+            const clientePorAsiento = {};
+            const checkboxes = document.querySelectorAll('input[name="asientos"]:checked');
+            let valid = true;
+
+            checkboxes.forEach(cb => {
+                const asientoId = cb.value;
+                const select = document.getElementById('select-cliente-' + asientoId);
+                const clienteId = select?.value;
+
+                if (!clienteId) {
+                    valid = false;
+                    select?.focus();
+                } else {
+                    clientePorAsiento[asientoId] = clienteId;
+                }
+            });
+
+            if (!valid) {
+                alert("Todos los asientos seleccionados deben tener un cliente asignado.");
+                return;
+            }
+
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'clientePorAsientoJson';
+            hiddenInput.value = JSON.stringify(clientePorAsiento);
+            evt.target.appendChild(hiddenInput);
+
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            evt.target.submit();
+        }
+    });
+</script>
+
+
+<style>
+    .asiento {
+        width: 40px;
+        height: 40px;
+        border: 1px solid #333;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-weight: bold;
+        user-select: none;
+        margin: 2px;
+        transition: background-color 0.2s ease-in-out;
+        font-size: 14px;
+    }
+
+    .asiento.disponible   { background-color: #90ee90; color: #000; }
+    .asiento.reservado    { background-color: #f0ad4e; color: #000; cursor: not-allowed; }
+    .asiento.pagado       { background-color: #d9534f; color: #fff; cursor: not-allowed; }
+    .asiento.seleccionado { background-color: #007bff !important; color: #fff !important; }
+
+    input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        width: 40px;
+        height: 40px;
+        margin: 0;
+        cursor: pointer;
+    }
+
+    input[type="checkbox"]:checked + label.asiento {
+        background-color: #007bff !important;
+        color: #fff !important;
+    }
+
+    /* Contenedor del bus con scroll horizontal en pantallas pequeñas */
+    .bus {
+        overflow-x: auto;
+        padding: 10px;
+        border: 1px dashed #ccc;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+    }
+
+    .fila {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: center;
+    }
+
+    /* ✅ Contador flotante */
+    #contadorFlotante {
+        position: sticky;
+        top: 10px;
+        right: 0;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-weight: bold;
+        z-index: 1050;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        float: right;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .asiento {
+            width: 32px;
+            height: 32px;
+            font-size: 12px;
+        }
+
+        input[type="checkbox"] {
+            width: 32px;
+            height: 32px;
+        }
+
+        #contadorFlotante {
+            position: relative;
+            float: none;
+            top: auto;
+            right: auto;
+            margin: 10px auto;
+            justify-content: center;
+        }
+
+        .modal-footer button {
+            width: 100%;
+        }
+
+        .fila {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+    }
+</style>

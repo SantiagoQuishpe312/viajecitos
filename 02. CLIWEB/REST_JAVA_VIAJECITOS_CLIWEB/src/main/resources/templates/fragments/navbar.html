@@ -1,0 +1,141 @@
+<!-- templates/fragments/navbar.html -->
+<nav th:fragment="navbar">
+    <a href="/" class="navbar-brand">Viajecitos SAS</a>
+
+    <div class="navbar-toggle" id="navbarToggle" aria-label="Toggle navigation" tabindex="0" role="button">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <ul class="navbar-menu" id="navbarMenu">
+        <li><a href="/" class="active">Inicio</a></li>
+        <li><a href="/facturas">Mis Facturas</a></li>
+        <li><a href="/mis-boletos">Mis Boletos</a></li>
+        <li>
+            <a th:href="@{/carrito/{id}(id=${cliente.clienteId})}" style="display: flex; align-items: center;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style="margin-right:6px;">
+                    <path d="M0 1a1 1 0 0 1 1-1h1.5a.5.5 0 0 1 0 1H1v1h1.5a.5.5 0 0 1 0 1H1v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V4H5.5a.5.5 0 0 1-.5-.5V2H1a1 1 0 0 1-1-1z"/>
+                    <path d="M3 6h10l-1 5H4L3 6z"/>
+                </svg>
+                Carrito
+            </a>
+        </li>
+        <li><a href="/login">Cerrar sesión</a></li>
+    </ul>
+
+    <style>
+    nav {
+        background-color: #0d6efd;
+        color: white;
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        font-family: Arial, sans-serif;
+        position: relative;
+    }
+
+    .navbar-brand {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: white;
+        text-decoration: none;
+    }
+
+    .navbar-menu {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .navbar-menu li {
+        margin-left: 15px;
+    }
+
+    .navbar-menu a {
+        display: block;
+        padding: 8px 12px;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+
+    .navbar-menu a:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: #ffc107;
+    }
+
+    .navbar-toggle {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+        width: 25px;
+    }
+
+    .navbar-toggle span {
+        height: 3px;
+        background: white;
+        margin: 4px 0;
+        border-radius: 2px;
+        transition: 0.3s;
+    }
+
+    @media (max-width: 768px) {
+        .navbar-toggle {
+            display: flex;
+        }
+
+        .navbar-menu {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            background-color: #0d6efd;
+            margin-top: 10px;
+            padding: 10px 0;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 1000;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 0 0 10px 10px;
+        }
+
+        .navbar-menu.show {
+            display: flex;
+        }
+
+        .navbar-menu li {
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .navbar-menu a {
+            padding: 12px;
+        }
+    }
+</style>
+
+
+    <script>
+        const toggle = document.getElementById('navbarToggle');
+        const menu = document.getElementById('navbarMenu');
+
+        toggle.addEventListener('click', () => {
+            menu.classList.toggle('show');
+        });
+
+        menu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (menu.classList.contains('show')) {
+                    menu.classList.remove('show');
+                }
+            });
+        });
+    </script>
+</nav>

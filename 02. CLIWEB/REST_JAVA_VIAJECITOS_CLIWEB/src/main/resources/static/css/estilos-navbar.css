@@ -1,0 +1,87 @@
+
+nav {
+    background-color: #0d6efd; /* azul bootstrap-like */
+    color: white;
+    padding: 0.8rem 1.5rem;
+    position: relative;
+    margin-top: 0px !important;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: white;
+    text-decoration: none;
+    user-select: none;
+}
+
+/* Menú */
+.navbar-menu {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+    margin-left: auto;
+}
+
+.navbar-menu li {
+    position: relative;
+}
+
+.navbar-menu a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.5rem 0.8rem;
+    display: block;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    user-select: none;
+}
+
+.navbar-menu a:hover,
+.navbar-menu a.active {
+    background-color: #ffc107; /* amarillo */
+    color: #000;
+}
+
+/* Botón hamburguesa */
+.navbar-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 28px;
+    height: 24px;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.navbar-toggle span {
+    display: block;
+    height: 3px;
+    background: white;
+    border-radius: 2px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .navbar-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: #0d6efd;
+        flex-direction: column;
+        width: 200px;
+        display: none;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        border-radius: 0 0 8px 8px;
+        z-index: 1000;
+    }
+
+    .navbar-menu.show {
+        display: flex;
+    }
+
+    .navbar-toggle {
+        display: flex;
+    }
+}
