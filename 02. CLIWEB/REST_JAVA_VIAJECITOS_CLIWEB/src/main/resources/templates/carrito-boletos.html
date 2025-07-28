@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carrito de Boletos Pendientes</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
@@ -31,13 +32,14 @@ h2 {
 .tabla-responsive {
     width: 100%;
     overflow-x: auto;
-    padding: 0 15px;
-    margin-bottom: 30px;
+    padding: 0;
+    margin-bottom: 20px;
 }
 
 table {
     border-collapse: collapse;
     width: 100%;
+    min-width: 600px; /* ← AGREGADO para scroll horizontal */
     max-width: 1000px;
     background: white;
     box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
@@ -69,6 +71,28 @@ tfoot td {
     font-weight: bold;
     background-color: #ecf0f1;
 }
+
+/* ✅ Hace que la tabla de amortización sea scrollable */
+#contenedorTablaAmortizacion {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+#tablaAmortizacion {
+    min-width: 500px;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    border-radius: 6px;
+}
+
+#tablaAmortizacion th, #tablaAmortizacion td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
 
 .no-boletos {
     margin-top: 40px;
@@ -227,6 +251,118 @@ button {
     }
 }
 
+@media (max-width: 600px) {
+    .tabla-responsive table,
+    .tabla-responsive thead,
+    .tabla-responsive tbody,
+    .tabla-responsive th,
+    .tabla-responsive td,
+    .tabla-responsive tr {
+        display: block;
+        width: 100%;
+    }
+    .tabla-responsive thead {
+        display: none;
+    }
+    tr {
+        margin-bottom: 15px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.05);
+        padding: 10px;
+    }
+    td {
+        text-align: left;
+        padding: 8px 12px;
+        border: none;
+        position: relative;
+    }
+    td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        display: block;
+        margin-bottom: 4px;
+        color: #2980b9;
+    }
+}
+@media (max-width: 600px) {
+    .btn-volver, button, select, input {
+        width: 100% !important;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 600px) {
+    .tarjeta-card {
+        font-size: 14px;
+        padding: 15px;
+    }
+    .tarjeta-card .numero {
+        font-size: 1em;
+    }
+    .tarjeta-card .marca img {
+        height: 22px;
+    }
+}
+
+@media (max-width: 600px) {
+    #modalTarjeta > div {
+        width: 95% !important;
+        max-width: 95%;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 600px) {
+    h2 {
+        font-size: 20px;
+        margin: 10px 0;
+    }
+    body {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 600px) {
+    tbody tr {
+        border: 1px solid #ddd;
+        background: #fff;
+        border-radius: 8px;
+        margin: 10px 0;
+        padding: 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    tbody td {
+        border-bottom: 1px dashed #eee;
+        padding: 8px 0;
+    }
+    tbody td:last-child {
+        border-bottom: none;
+    }
+    tbody td a {
+        display: inline-block;
+        color: #e74c3c;
+        font-weight: bold;
+        text-decoration: none;
+    }
+}
+
+@media (max-width: 600px) {
+    table {
+        min-width: auto;   /* ✅ elimina el ancho mínimo */
+        width: 100%;       /* ✅ se ajusta al ancho del móvil */
+        margin: 0;         /* ✅ quita margen lateral */
+    }
+    .tabla-responsive {
+        padding: 0;        /* ✅ quita padding lateral */
+        overflow-x: hidden;/* ✅ evita scroll horizontal */
+    }
+    body {
+        align-items: stretch; /* ✅ hace que ocupe todo el ancho */
+    }
+}
+
+
     </style>
 </head>
 <body>
@@ -251,19 +387,20 @@ button {
     </thead>
     <tbody>
     <tr th:each="boleto : ${boletos}">
-        <td>
+        <td data-label="Acción">
             <a th:href="@{'/boletos/eliminar/' + ${boleto.boleto.boletoId}}"
                onclick="return confirm('¿Seguro que quieres eliminar este boleto?')"
                class="trash-icon" title="Eliminar boleto">
                 <i class="fas fa-trash-alt"></i>Eliminar
             </a>
         </td>
-        <td th:text="${boleto.boleto.boletoId}">1</td>
-        <td th:text="${boleto.cuidadOrigen.ciudadNombre}">Quito</td>
-        <td th:text="${boleto.ciudadDestino.ciudadNombre}">Guayaquil</td>
-        <td th:text="${#temporals.format(boleto.vuelo.vueloFechaSalida, 'dd/MM/yyyy HH:mm')}">28/06/2025 15:00</td>
-        <td th:text="${boleto.boleto.boletoCantidad}">2</td>
-        <td th:text="${boleto.vuelo.vueloValor.multiply(new java.math.BigDecimal(boleto.boleto.boletoCantidad))}">20.00</td>
+        <td data-label="ID" th:text="${boleto.boleto.boletoId}">1</td>
+<td data-label="Origen" th:text="${boleto.cuidadOrigen.ciudadNombre}">Quito</td>
+<td data-label="Destino" th:text="${boleto.ciudadDestino.ciudadNombre}">Guayaquil</td>
+<td data-label="Fecha" th:text="${#temporals.format(boleto.vuelo.vueloFechaSalida, 'dd/MM/yyyy HH:mm')}">28/06/2025 15:00</td>
+<td data-label="Cantidad" th:text="${boleto.boleto.boletoCantidad}">2</td>
+<td data-label="Precio Total" th:text="${boleto.vuelo.vueloValor.multiply(new java.math.BigDecimal(boleto.boleto.boletoCantidad))}">20.00</td>
+
     </tr>
     </tbody>
     <tfoot>

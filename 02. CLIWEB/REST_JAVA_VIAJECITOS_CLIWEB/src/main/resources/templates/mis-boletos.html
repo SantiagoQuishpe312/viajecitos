@@ -1,246 +1,252 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="es">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Mis Boletos</title>
-    <link rel="stylesheet" th:href="@{/css/estilos-navbar.css}" />
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Mis Boletos</title>
+        <link rel="stylesheet" th:href="@{/css/estilos-navbar.css}" />
 
-    <style>
-        /* Reset y base */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            padding: 20px 15px 40px;
-            color: #2c3e50;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        /* Título */
-        h2 {
-            text-align: center;
-            font-weight: 700;
-            font-size: 2rem;
-            margin-bottom: 20px;
-            color: #0d6efd;
-            text-shadow: 0 1px 3px rgba(13,110,253,0.3);
-        }
-
-        /* Contenedor tabla */
-        .table-container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(13,110,253,0.1);
-            overflow-x: auto;
-            padding: 10px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 12px;
-            min-width: 600px;
-        }
-
-        thead tr {
-            background-color: #e7f1ff;
-            border-radius: 12px;
-            box-shadow: inset 0 0 10px rgba(13,110,253,0.15);
-        }
-
-        th, td {
-            padding: 14px 12px;
-            text-align: center;
-            font-weight: 600;
-            color: #1e293b;
-            vertical-align: middle;
-        }
-
-        tbody tr {
-            background: #ffffff;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-            border-radius: 8px;
-            transition: transform 0.2s;
-        }
-
-        tbody tr:hover {
-            transform: scale(1.02);
-            box-shadow: 0 6px 12px rgba(13,110,253,0.15);
-        }
-
-        /* Botón imprimir */
-        .btn-imprimir {
-            background-color: #0d6efd;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 18px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            box-shadow: 0 4px 8px rgba(13,110,253,0.3);
-        }
-
-        .btn-imprimir:hover {
-            background-color: #084cdf;
-            box-shadow: 0 6px 12px rgba(8,76,223,0.5);
-        }
-
-        /* Volver link */
-        .volver {
-            display: block;
-            max-width: 900px;
-            margin: 30px auto 0;
-            text-align: center;
-            text-decoration: none;
-            font-weight: 700;
-            color: #0d6efd;
-            font-size: 1.1rem;
-            transition: color 0.3s ease;
-        }
-
-        .volver:hover {
-            color: #084cdf;
-        }
-
-        /* Mensaje sin boletos */
-        p {
-            max-width: 900px;
-            margin: 40px auto 0;
-            font-size: 1.1rem;
-            color: #6c757d;
-        }
-
-        /* --- Responsive para móvil --- */
-        @media (max-width: 768px) {
+        <style>
+            /* Reset y base */
             body {
-                padding: 15px 10px 30px;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: #f4f6f9;
+                margin: 0;
+                padding: 20px 15px 40px;
+                color: #2c3e50;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
             }
-            h2 {
-                font-size: 1.6rem;
-                margin-bottom: 15px;
-            }
-            .table-container {
-                max-width: 100%;
-                padding: 8px;
-            }
-            table {
-                min-width: 100%;
-            }
-        }
 
-        @media (max-width: 576px) {
-            /* Convertir filas en cards apiladas para mejor lectura */
-            table, thead, tbody, th, td, tr {
-                display: block;
+            /* Título */
+            h2 {
+                text-align: center;
+                font-weight: 700;
+                font-size: 2rem;
+                margin-bottom: 20px;
+                color: #0d6efd;
+                text-shadow: 0 1px 3px rgba(13,110,253,0.3);
+            }
+
+            /* Contenedor tabla */
+            .table-container {
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 8px 20px rgba(13,110,253,0.1);
+                overflow-x: auto;
+                padding: 10px;
+                max-width: 900px;
+                margin: 0 auto;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0 12px;
+                min-width: 600px;
             }
 
             thead tr {
-                display: none; /* Ocultar encabezado */
+                background-color: #e7f1ff;
+                border-radius: 12px;
+                box-shadow: inset 0 0 10px rgba(13,110,253,0.15);
+            }
+
+            th, td {
+                padding: 14px 12px;
+                text-align: center;
+                font-weight: 600;
+                color: #1e293b;
+                vertical-align: middle;
             }
 
             tbody tr {
-                margin-bottom: 20px;
-                padding: 20px;
-                background: white;
-                border-radius: 12px;
-                box-shadow: 0 4px 12px rgba(13,110,253,0.1);
+                background: #ffffff;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+                border-radius: 8px;
+                transition: transform 0.2s;
             }
 
             tbody tr:hover {
-                transform: none;
-                box-shadow: 0 4px 12px rgba(13,110,253,0.2);
+                transform: scale(1.02);
+                box-shadow: 0 6px 12px rgba(13,110,253,0.15);
             }
 
-            tbody td {
-                text-align: left;
-                padding: 12px 0;
-                position: relative;
-                padding-left: 140px;
-                font-weight: 600;
-                border: none;
-                color: #0d6efd;
-            }
-
-            tbody td::before {
-                position: absolute;
-                top: 12px;
-                left: 10px;
-                width: 120px;
-                padding-right: 10px;
-                white-space: nowrap;
-                font-weight: 700;
-                color: #495057;
-                content: attr(data-label);
-            }
-
-            tbody td:last-child {
-                padding-left: 10px;
-                text-align: center;
-                color: initial;
-                font-weight: normal;
-            }
-
+            /* Botón imprimir */
             .btn-imprimir {
-                width: 100%;
-                padding: 12px 0;
-                font-size: 1.1rem;
+                background-color: #0d6efd;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 10px 18px;
+                font-size: 1rem;
+                font-weight: 700;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+                box-shadow: 0 4px 8px rgba(13,110,253,0.3);
             }
-        }
-    </style>
 
-    <script>
-        function imprimirBoleto(id) {
-            window.open('/boletos/imprimir/' + id, '_blank');
-        }
-    </script>
-</head>
-<body>
+            .btn-imprimir:hover {
+                background-color: #084cdf;
+                box-shadow: 0 6px 12px rgba(8,76,223,0.5);
+            }
 
-<div th:replace="~{fragments/navbar :: navbar}"></div>
+            /* Volver link */
+            .volver {
+                display: block;
+                max-width: 900px;
+                margin: 30px auto 0;
+                text-align: center;
+                text-decoration: none;
+                font-weight: 700;
+                color: #0d6efd;
+                font-size: 1.1rem;
+                transition: color 0.3s ease;
+            }
 
-<h2>Mis Boletos</h2>
+            .volver:hover {
+                color: #084cdf;
+            }
 
-<div th:if="${#lists.isEmpty(boletos)}">
-    <p>No tienes boletos aún.</p>
-</div>
+            /* Mensaje sin boletos */
+            p {
+                max-width: 900px;
+                margin: 40px auto 0;
+                font-size: 1.1rem;
+                color: #6c757d;
+            }
 
-<div th:if="${not #lists.isEmpty(boletos)}" class="table-container">
-    <table>
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Destino</th>
-            <th>Fecha de Compra</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="boleto : ${boletos}">
-            <td data-label="ID" th:text="${boleto.boleto.boletoId}"></td>
-            <td data-label="Destino" th:text="|${boleto.ciudadDestino.ciudadCodigo} - ${boleto.ciudadDestino.ciudadNombre}|"></td>
-            <td data-label="Fecha de Compra" th:text="${#temporals.format(boleto.boleto.boletoFechaCompra, 'dd/MM/yyyy HH:mm')}"></td>
-            <td data-label="Estado" th:text="${boleto.boleto.boletoEstado}"></td>
-            <td data-label="Acciones">
-                <button type="button"
-                        class="btn-imprimir"
-                        th:if="${boleto.boleto.boletoEstado == 'PAGADO'}"
-                        th:onclick="'imprimirBoleto(' + ${boleto.boleto.boletoId} + ')'">
-                    Imprimir
-                </button>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</div>
+            /* --- Responsive para móvil --- */
+            @media (max-width: 768px) {
+                body {
+                    padding: 15px 10px 30px;
+                }
+                h2 {
+                    font-size: 1.6rem;
+                    margin-bottom: 15px;
+                }
+                .table-container {
+                    max-width: 100%;
+                    padding: 8px;
+                }
+                table {
+                    min-width: 100%;
+                }
+            }
 
-<a href="/" class="volver">← Volver al Inicio</a>
+            @media (max-width: 576px) {
+                /* Convertir filas en cards apiladas para mejor lectura */
+                table, thead, tbody, th, td, tr {
+                    display: block;
+                }
 
-</body>
+                thead tr {
+                    display: none; /* Ocultar encabezado */
+                }
+
+                tbody tr {
+                    margin-bottom: 20px;
+                    padding: 20px;
+                    background: white;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 12px rgba(13,110,253,0.1);
+                }
+
+                tbody tr:hover {
+                    transform: none;
+                    box-shadow: 0 4px 12px rgba(13,110,253,0.2);
+                }
+
+                tbody td {
+                    text-align: left;
+                    padding: 12px 0;
+                    position: relative;
+                    padding-left: 140px;
+                    font-weight: 600;
+                    border: none;
+                    color: #0d6efd;
+                }
+
+                tbody td::before {
+                    position: absolute;
+                    top: 12px;
+                    left: 10px;
+                    width: 120px;
+                    padding-right: 10px;
+                    white-space: nowrap;
+                    font-weight: 700;
+                    color: #495057;
+                    content: attr(data-label);
+                }
+
+                tbody td:last-child {
+                    padding-left: 10px;
+                    text-align: center;
+                    color: initial;
+                    font-weight: normal;
+                }
+
+                @media (max-width: 576px) {
+                    tbody td:last-child::before {
+                        content: none;
+                    }
+                }
+
+                .btn-imprimir {
+                    width: 100%;
+                    padding: 12px 0;
+                    font-size: 1.1rem;
+                }
+            }
+        </style>
+
+        <script>
+            function imprimirBoleto(id) {
+                window.open('/boletos/imprimir/' + id, '_blank');
+            }
+        </script>
+    </head>
+    <body>
+
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+        <h2>Mis Boletos</h2>
+
+        <div th:if="${#lists.isEmpty(boletos)}">
+            <p>No tienes boletos aún.</p>
+        </div>
+
+        <div th:if="${not #lists.isEmpty(boletos)}" class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Destino</th>
+                        <th>Fecha de Compra</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="boleto : ${boletos}">
+                        <td data-label="ID" th:text="${boleto.boleto.boletoId}"></td>
+                        <td data-label="Destino" th:text="|${boleto.ciudadDestino.ciudadCodigo} - ${boleto.ciudadDestino.ciudadNombre}|"></td>
+                        <td data-label="Fecha de Compra" th:text="${#temporals.format(boleto.boleto.boletoFechaCompra, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td data-label="Estado" th:text="${boleto.boleto.boletoEstado}"></td>
+                        <td data-label="Acciones">
+                            <button type="button"
+                                    class="btn-imprimir"
+                                    th:if="${boleto.boleto.boletoEstado == 'PAGADO'}"
+                                    th:onclick="'imprimirBoleto(' + ${boleto.boleto.boletoId} + ')'">
+                                Imprimir
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <a href="/" class="volver">← Volver al Inicio</a>
+
+    </body>
 </html>
